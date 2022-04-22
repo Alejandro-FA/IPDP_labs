@@ -1,12 +1,19 @@
 #include <stdio.h>
 #include <stdlib.h>
-
+#include <time.h>
+#include "omp.h"
 // GLOBAL VARIABLES
 
 int * a;
 int * b;
 
 // FUNCTIONS
+void incorrect_arguments() {
+    printf("3 arguments are required:\n");
+    printf("   The first argument is the mode of execution. Possible values are '1' (sequential), '2' (parralel) and '3' (parallel with vectorization).\n");
+    printf("   The second argument is the number of threads to use. Not required for sequential execution.\n");
+    printf("   The third argument (or second one for the sequential mode) defines the size of the vectors. It must be a positive integer value. \n");
+}
 
 void init_vectors(int size){
     a = malloc(sizeof(int) * size);
@@ -19,24 +26,30 @@ void init_vectors(int size){
 
 int dot_product(int num_threads ,int size){
     int sum = 0;
-    for(int i = 0; i < size; i++){
+    
+    // #pragma omp parallel num_threads(num_threads)
+    // {
+    //     int sum_tmp = 0;
+    //     #pragma omp for
+    //     for(int i = 0; i < size; i++){
+    //         sum_tmp += a[i]*b[i];
+    //     }
+    //     #pragma omp critical
+    //     {
+    //         sum += sum_tmp;
+    //     }
+    // }
+
+    #pragma omp parallel for num_threads(num_threads) reduction(+:sum)
+    for(int i = 0; i< size; i++){
         sum += a[i]*b[i];
     }
+    
     return sum;
 }
 
 // MAIN CODE
-
 int main(int argc, char* argv[]){
-
-    // Check that the number of arguments is correct
-    if(argc < 3 || argc > 4){
-        printf("3 arguments are required:\n");
-        printf("   The first argument is the mode of execution. Possible values are '1' (sequential), '2' (parralel) and '3' (parallel with vectorization).\n");
-        printf("   The second argument is the number of threads to use. Not required for sequential execution.\n");
-        printf("   The third argument (or second one for the sequential mode) defines the size of the vectors. It must be a positive integer value. \n");
-        return -1;
-    }
 
     // Retrieve parameters and check that the value is correct
     int exec_type = atoi(argv[1]);
@@ -44,11 +57,19 @@ int main(int argc, char* argv[]){
     int size;
     switch(exec_type){
         case 1:
+            if (argc != 3) {
+                incorrect_arguments();
+                return -1;
+            }
             num_threads = 1;
             size = atoi(argv[2]);
             break;
         case 2:
         case 3:
+            if (argc != 4) {
+                incorrect_arguments();
+                return -1;
+            }
             num_threads = atoi(argv[2]);
             size = atoi(argv[3]);
             break;
@@ -68,9 +89,14 @@ int main(int argc, char* argv[]){
 
     // main program
     init_vectors(size);
-    double runtime = 0.0;
+    
+    clock_t time1, time2;
+    double dub_time;
+    time1 = clock();
     int sum = dot_product(num_threads, size);
-    printf("%.4e\t%i\n", runtime, sum);
+    time2 = clock();
+    dub_time = (time2 - time1)/(double)CLOCKS_PER_SEC;
+    printf("%lf\t%i\n", dub_time, sum);
 
     // Free heap memory and exit function
     free(a);
