@@ -1,0 +1,4 @@
+# Exclude files that are produced after compilation
+*.out
+*.err
+
