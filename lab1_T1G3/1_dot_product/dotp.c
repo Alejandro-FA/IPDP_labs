@@ -90,13 +90,13 @@ int main(int argc, char* argv[]){
     // main program
     init_vectors(size);
     
-    clock_t time1, time2;
+    time_t time1, time2;
     double dub_time;
-    time1 = clock();
+    time(&time1);
     int sum = dot_product(num_threads, size);
-    time2 = clock();
-    dub_time = (time2 - time1)/(double)CLOCKS_PER_SEC;
-    printf("%lf\t%i\n", dub_time, sum);
+    time(&time2);
+    dub_time = (double)(time2 - time1);
+    printf("%f\t%i\n", dub_time, sum);
 
     // Free heap memory and exit function
     free(a);
