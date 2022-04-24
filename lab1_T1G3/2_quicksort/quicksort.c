@@ -13,6 +13,11 @@ static inline __attribute__((always_inline)) void start_timer(){gettimeofday(&in
 static inline __attribute__((always_inline)) void stop_timer(long long *elp){
     gettimeofday(&stop, NULL);
     *elp = (stop.tv_sec - init.tv_sec) * 1e6 + stop.tv_usec - init.tv_usec;}
+
+void print_vector(int* a, int size) {
+    for (int i = 0; i < size; i++) printf("%d ", a[i]);
+    printf("\n");
+}
     
 int partition(int *a, int lo, int hi){
     int     i = lo, 
@@ -71,6 +76,8 @@ int main(int argc, char *argv[])
     int *a = malloc(size * sizeof(int));
     for (int i = 0; i < size; i++) {a[i] = rand() % size;}
 
+    print_vector(a, size); // FIXME: just a test, remove
+
     start_timer();
     Quicksort(a, 0, size - 1);
     stop_timer(&elp);
@@ -85,6 +92,8 @@ int main(int argc, char *argv[])
     if (counter != 0) printf("1\n");
     else printf("0\n");
     
+    print_vector(a, size); // FIXME: just a test, remove
+
     free(a);
     
     return 0;
