@@ -71,7 +71,7 @@ int main(int argc, char *argv[])
     start_timer();
 
     // Parallelize Quicksort with tasks
-    #pragma omp parallel
+    #pragma omp parallel // We create threads outside to avoid massive overhead
     {
         #pragma omp single nowait
         Quicksort(a, 0, size - 1);
