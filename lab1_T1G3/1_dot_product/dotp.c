@@ -45,7 +45,7 @@ int dot_product(int size, int exec_type, int num_threads) { //TODO: Modify funct
         }
         break;
     case 3:
-        #pragma omp parallel for num_threads(num_threads) reduction(+: sum) simd
+        #pragma omp parallel for simd num_threads(num_threads) reduction(+: sum)
         for(int i = 0; i< size; i++) {
             sum += a[i]*b[i];
         }
