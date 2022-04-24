@@ -39,9 +39,20 @@ void Quicksort(int *a, int lo, int hi){
     if ( lo < hi ) {
         int p = partition(a, lo, hi);
         
-        {(void) Quicksort(a, lo, p - 1);} // Left branch
-        {(void) Quicksort(a, p + 1, hi);} // Right branch
-
+        #pragma omp parallel
+        {
+            #pragma omp single nowait
+            {
+                #pragma omp task
+                {
+                    {(void) Quicksort(a, lo, p - 1);} // Left branch
+                }
+                #pragma omp task
+                {
+                    {(void) Quicksort(a, p + 1, hi);} // Right branch
+                }
+            }
+        }
     }
 }
  
@@ -54,7 +65,8 @@ int main(int argc, char *argv[])
     
     long long elp = 0;
     
-    if (argc < 1 || sscanf(argv[1], "%i", &size)!=1) {printf("\n\nPlease add size as argument.\n\n"); return -1;}
+    if (argc < 1 || sscanf(argv[1], "%i", &size)!=1) {printf("\n\nPlease set the size of the array!\n\n"); return -1;}
+    
     
     int *a = malloc(size * sizeof(int));
     for (int i = 0; i < size; i++) {a[i] = rand() % size;}
