@@ -32,9 +32,24 @@ void init_vectors(int size){
 // Perform dot product in parallel
 int dot_product(int size, int exec_type, int num_threads) { //TODO: Modify function depending on execution type
     int sum = 0;
-    #pragma omp parallel for num_threads(num_threads) reduction(+:sum)
-    for(int i = 0; i< size; i++) {
-        sum += a[i]*b[i];
+
+    switch(exec_type) {
+    case 1:
+        for(int i = 0; i< size; i++)
+            sum += a[i]*b[i];
+        break;
+    case 2:
+        #pragma omp parallel for num_threads(num_threads) reduction(+: sum)
+        for(int i = 0; i< size; i++) {
+            sum += a[i]*b[i];
+        }
+        break;
+    case 3:
+        #pragma omp parallel for num_threads(num_threads) reduction(+: sum) simd
+        for(int i = 0; i< size; i++) {
+            sum += a[i]*b[i];
+        }
+        break;
     }
     return sum;
 }
