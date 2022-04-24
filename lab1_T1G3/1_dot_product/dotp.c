@@ -1,7 +1,19 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <sys/time.h>
 #include "omp.h"
+
+// BENCHMARKING
+struct timeval  stop,
+                init;
+
+static inline __attribute__((always_inline)) void start_timer(){gettimeofday(&init, NULL);}
+
+static inline __attribute__((always_inline)) void stop_timer(long long *elp){
+    gettimeofday(&stop, NULL);
+    *elp = (stop.tv_sec - init.tv_sec) * 1e6 + stop.tv_usec - init.tv_usec;}
+
 // GLOBAL VARIABLES
 
 int * a;
@@ -89,14 +101,13 @@ int main(int argc, char* argv[]){
 
     // main program
     init_vectors(size);
-    
-    time_t time1, time2;
-    double dub_time;
-    time(&time1);
+    long long elp = 0;
+    start_timer();
     int sum = dot_product(num_threads, size);
-    time(&time2);
-    dub_time = (double)(time2 - time1);
-    printf("%f\t%i\n", dub_time, sum);
+    stop_timer(&elp);
+    double runtime = (double) elp / 1000000.0;
+
+    printf("%lf\t%i\n", runtime, sum);
 
     // Free heap memory and exit function
     free(a);
