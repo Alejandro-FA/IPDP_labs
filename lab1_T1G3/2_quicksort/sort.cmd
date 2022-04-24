@@ -12,5 +12,5 @@ module load GCC/10.2.0
 
 make clean >> out_sort.err && make >> out_sort.err || exit 1 
 
-./a.out 100000000
+./a.out 1000000 >> results.out
 

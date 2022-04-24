@@ -14,6 +14,7 @@ static inline __attribute__((always_inline)) void stop_timer(long long *elp){
     gettimeofday(&stop, NULL);
     *elp = (stop.tv_sec - init.tv_sec) * 1e6 + stop.tv_usec - init.tv_usec;}
 
+// FIXME: remove auxiliary function for tests
 void print_vector(int* a, int size) {
     for (int i = 0; i < size; i++) printf("%d ", a[i]);
     printf("\n");
@@ -46,16 +47,12 @@ void Quicksort(int *a, int lo, int hi){
         
         #pragma omp parallel
         {
-            #pragma omp single nowait
+            #pragma omp single
             {
                 #pragma omp task
-                {
-                    {(void) Quicksort(a, lo, p - 1);} // Left branch
-                }
+                { (void) Quicksort(a, lo, p - 1); } // Left branch
                 #pragma omp task
-                {
-                    {(void) Quicksort(a, p + 1, hi);} // Right branch
-                }
+                { (void) Quicksort(a, p + 1, hi); } // Right branch
             }
         }
     }
@@ -76,8 +73,6 @@ int main(int argc, char *argv[])
     int *a = malloc(size * sizeof(int));
     for (int i = 0; i < size; i++) {a[i] = rand() % size;}
 
-    print_vector(a, size); // FIXME: just a test, remove
-
     start_timer();
     Quicksort(a, 0, size - 1);
     stop_timer(&elp);
@@ -91,8 +86,6 @@ int main(int argc, char *argv[])
     }
     if (counter != 0) printf("1\n");
     else printf("0\n");
-    
-    print_vector(a, size); // FIXME: just a test, remove
 
     free(a);
     
