@@ -45,16 +45,11 @@ void Quicksort(int *a, int lo, int hi){
     if ( lo < hi ) {
         int p = partition(a, lo, hi);
         
-        #pragma omp parallel
-        {
-            #pragma omp single
-            {
-                #pragma omp task
-                { (void) Quicksort(a, lo, p - 1); } // Left branch
-                #pragma omp task
-                { (void) Quicksort(a, p + 1, hi); } // Right branch
-            }
-        }
+        #pragma omp task
+        { (void) Quicksort(a, lo, p - 1); } // Left branch
+        #pragma omp task
+        { (void) Quicksort(a, p + 1, hi); } // Right branch
+        #pragma omp taskwait
     }
 }
  
@@ -74,7 +69,13 @@ int main(int argc, char *argv[])
     for (int i = 0; i < size; i++) {a[i] = rand() % size;}
 
     start_timer();
-    Quicksort(a, 0, size - 1);
+
+    // Parallelize Quicksort with tasks
+    #pragma omp parallel
+    {
+        #pragma omp single nowait
+        Quicksort(a, 0, size - 1);
+    }
     stop_timer(&elp);
     
     double runtime = (double) elp / 1000000.0;
