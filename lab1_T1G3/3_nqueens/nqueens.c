@@ -4,6 +4,7 @@
 #include <string.h>
 #include <time.h>
 #include <sys/time.h>
+#include <omp.h>
 
 struct timeval  stop,
                 init;
@@ -19,16 +20,19 @@ long long tottime;
         
         
 int Fitness(int *array, int size){
-    int j, k;
     int attack = 0;
 
-    for (j = 0; j < size; j++){
-        for (k = (size-1); k > j; k--){
+    // We have decided to declare both indexes i and j inside the parallel region so they do not need to be privatized     
+    #pragma omp parallel for reduction(+: attack) schedule(dynamic)
+    for (int j = 0; j < size; j++){
+        for (int k = (size-1); k > j; k--){
             if ((array)[k] == (array)[j] || (((abs((array)[k]-(array)[j])) == (k-j)))) {
                 attack++;
             }
         }
     }
+
+
     return attack;
 }      
 

@@ -1,5 +1,5 @@
 COMPILER	= gcc
-CFLAGS		= -std=c99 -Wall -fopenmp
+CFLAGS		= -std=c99 -Wall -fopenmp -pg
 LIBS		= -lm
 OBJ		= nqueens
 TARGET		= a.out
