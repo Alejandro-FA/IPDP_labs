@@ -23,15 +23,13 @@ int Fitness(int *array, int size){
     int attack = 0;
 
     // We have decided to declare both indexes i and j inside the parallel region so they do not need to be privatized     
-    #pragma omp parallel for reduction(+: attack) schedule(dynamic)
-    for (int j = 0; j < size; j++){
-        for (int k = (size-1); k > j; k--){
-            if ((array)[k] == (array)[j] || (((abs((array)[k]-(array)[j])) == (k-j)))) {
+    #pragma omp parallel for reduction(+: attack) schedule(static,1) // We have found that this scheduler is what provides the best results
+    for (int j = 0; j < size; j++) {
+        for (int k = (size-1); k > j; k--) {
+            if ((array)[k] == (array)[j] || (((abs((array)[k]-(array)[j])) == (k-j))))
                 attack++;
-            }
         }
     }
-
 
     return attack;
 }      
