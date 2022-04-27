@@ -12,5 +12,5 @@ module load GCC/10.2.0
 
 make clean >> out_dotp.err && make >> out_dotp.err || exit 1 
 
-./a.out 2 8 100000000 >> results.out
+./a.out 1 2 100000000 >> results.out
 

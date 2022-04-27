@@ -1,18 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <sys/time.h>
 #include <omp.h>
-
-/************************* BENCHMARKING *************************/
-struct timeval stop, init;
-
-static inline __attribute__((always_inline)) void start_timer() { gettimeofday(&init, NULL); }
-
-static inline __attribute__((always_inline)) void stop_timer(long long *elp) {
-    gettimeofday(&stop, NULL);
-    *elp = (stop.tv_sec - init.tv_sec) * 1e6 + stop.tv_usec - init.tv_usec;
-}
-
 
 /********************** AUXILIARY FUNCTIONS *********************/
 // Vectors to perform the dot product are global variables
@@ -30,11 +18,21 @@ void init_vectors(int size){
 }
 
 // Perform dot product in parallel
-int dot_product(int size, int exec_type, int num_threads) { //TODO: Modify function depending on execution type
+int dot_product(int size, int exec_type, int num_threads) {
     int sum = 0;
-    #pragma omp parallel for num_threads(num_threads) reduction(+:sum)
-    for(int i = 0; i< size; i++) {
-        sum += a[i]*b[i];
+
+    switch(exec_type) {
+    case 1:
+        for(int i = 0; i< size; i++) sum += a[i]*b[i];
+        break;
+    case 2:
+        #pragma omp parallel for reduction(+: sum) num_threads(num_threads)
+        for(int i = 0; i< size; i++) sum += a[i]*b[i];
+        break;
+    case 3:
+        #pragma omp parallel for simd reduction(+: sum) num_threads(num_threads)
+        for(int i = 0; i< size; i++) sum += a[i]*b[i];
+        break;
     }
     return sum;
 }
@@ -54,7 +52,7 @@ int main(int argc, char* argv[]){
 
     // Retrieve parameters and check that the value is correct
     int exec_type = atoi(argv[1]);
-    int num_threads = atoi(argv[2]);
+    int num_threads = exec_type == 1 ? 1 : atoi(argv[2]);
     int size = atoi(argv[3]);
 
     printf("exec_type: %d, num_threads: %d, size: %d\n", exec_type, num_threads, size);
@@ -74,11 +72,10 @@ int main(int argc, char* argv[]){
 
     // Perform dot product and compute runtime
     init_vectors(size);
-    long long elp = 0;
-    start_timer();
+    double start = omp_get_wtime();
     int result = dot_product(size, exec_type, num_threads);
-    stop_timer(&elp);
-    double runtime = (double) elp / 1000000.0;
+    double end = omp_get_wtime();
+    double runtime = end - start;
 
     printf("%.4e\t%i\n", runtime, result);
 
