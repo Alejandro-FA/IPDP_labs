@@ -41,7 +41,7 @@ void incorrect_arguments() {
     printf("3 arguments are required:\n");
     printf("   The first argument is the mode of execution. Possible values are '1' (sequential), '2' (parallel) and '3' (parallel with vectorization).\n");
     printf("   The second argument is the number of threads to use. Ignored for sequential execution.\n");
-    printf("   The third argument (or second one for the sequential mode) defines the size of the vectors. It must be a positive integer value. \n");
+    printf("   The third argument defines the size of the vectors. It must be a positive integer value. \n");
 }
 
 
@@ -50,13 +50,12 @@ int main(int argc, char* argv[]){
     // Ensure that we have 3 arguments
     if (argc != 4) { incorrect_arguments(); return -1; }
 
-    // Retrieve parameters and check that the value is correct
+    // Retrieve arguments
     int exec_type = atoi(argv[1]);
     int num_threads = exec_type == 1 ? 1 : atoi(argv[2]);
     int size = atoi(argv[3]);
 
-    // printf("exec_type: %d, num_threads: %d, size: %d\n", exec_type, num_threads, size);
-
+    // Check that arguments are correct
     if (exec_type != 1 && exec_type != 2 && exec_type != 3) {
         printf("The execution type is incorrect!\nPossible arguments are '1' (sequential), '2' (parallel) and '3' (parallel with vectorization)\n");
         return -1;
@@ -66,7 +65,7 @@ int main(int argc, char* argv[]){
         num_threads = 1;
     }
     if(size < 1){
-        printf("The third argument (or second one for the sequential mode) defines the size of the vectors. It must be a positive (>0) integer value. \n");
+        printf("The third argument defines the size of the vectors. It must be a positive (>0) integer value. \n");
         return -1;
     }
 
