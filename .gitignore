@@ -3,3 +3,4 @@
 *.err
 dotp
 test
+.DS_Store
