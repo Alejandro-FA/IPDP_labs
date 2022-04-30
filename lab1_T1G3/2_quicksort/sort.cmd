@@ -3,8 +3,10 @@
 #SBATCH --output=out_sort.out
 #SBATCH --error=out_sort.err
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=1
+#SBATCH --cpus-per-task=16
 #SBATCH --time=00:00:10
+
+export OMP_NUM_THREADS=16
 
 source /etc/profile.d/z00-global-profile.sh
 

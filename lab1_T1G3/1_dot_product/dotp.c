@@ -55,7 +55,7 @@ int main(int argc, char* argv[]){
     int num_threads = exec_type == 1 ? 1 : atoi(argv[2]);
     int size = atoi(argv[3]);
 
-    printf("exec_type: %d, num_threads: %d, size: %d\n", exec_type, num_threads, size);
+    // printf("exec_type: %d, num_threads: %d, size: %d\n", exec_type, num_threads, size);
 
     if (exec_type != 1 && exec_type != 2 && exec_type != 3) {
         printf("The execution type is incorrect!\nPossible arguments are '1' (sequential), '2' (parallel) and '3' (parallel with vectorization)\n");

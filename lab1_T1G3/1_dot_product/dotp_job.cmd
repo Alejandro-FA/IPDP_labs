@@ -12,5 +12,33 @@ module load GCC/10.2.0
 
 make clean >> out_dotp.err && make >> out_dotp.err || exit 1 
 
-./a.out 1 2 100000000 >> results.out
+echo "Sequential execution"
+for i in {1..20}
+do
+    ./a.out 1 1 100000000
+done
+
+echo "\nParallel execution 1 thread"
+for i in {1..20}
+do
+    ./a.out 1 1 100000000
+done
+
+echo "\nParallel execution 2 threads"
+for i in {1..20}
+do
+    ./a.out 1 1 100000000
+done
+
+echo "\nParallel execution 4 threads"
+for i in {1..20}
+do
+    ./a.out 1 1 100000000
+done
+
+echo "\nParallel execution 8 threads"
+for i in {1..20}
+do
+    ./a.out 1 1 100000000
+done
 

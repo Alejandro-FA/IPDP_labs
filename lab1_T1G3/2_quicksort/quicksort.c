@@ -14,11 +14,6 @@ static inline __attribute__((always_inline)) void stop_timer(long long *elp){
     gettimeofday(&stop, NULL);
     *elp = (stop.tv_sec - init.tv_sec) * 1e6 + stop.tv_usec - init.tv_usec;}
 
-// FIXME: remove auxiliary function for tests
-void print_vector(int* a, int size) {
-    for (int i = 0; i < size; i++) printf("%d ", a[i]);
-    printf("\n");
-}
     
 int partition(int *a, int lo, int hi){
     int     i = lo, 
@@ -43,13 +38,14 @@ int partition(int *a, int lo, int hi){
 
 void Quicksort(int *a, int lo, int hi){
     if ( lo < hi ) {
-        int p = partition(a, lo, hi);
-        
-        #pragma omp task
-        { (void) Quicksort(a, lo, p - 1); } // Left branch
-        #pragma omp task
-        { (void) Quicksort(a, p + 1, hi); } // Right branch
-        #pragma omp taskwait
+        // if ( hi - lo <= 5 ) {
+            int p = partition(a, lo, hi);
+            
+            #pragma omp task
+            { (void) Quicksort(a, lo, p - 1); } // Left branch
+            #pragma omp task
+            { (void) Quicksort(a, p + 1, hi); } // Right branch
+        // }
     }
 }
  
@@ -73,7 +69,7 @@ int main(int argc, char *argv[])
     // Parallelize Quicksort with tasks
     #pragma omp parallel // We create threads outside to avoid massive overhead
     {
-        #pragma omp single nowait
+        #pragma omp single
         Quicksort(a, 0, size - 1);
     }
     stop_timer(&elp);
