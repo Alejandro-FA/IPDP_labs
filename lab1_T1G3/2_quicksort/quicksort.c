@@ -98,7 +98,16 @@ int main(int argc, char *argv[])
     #pragma omp parallel num_threads(num_threads) // We create threads outside to avoid massive overhead
     {
         #pragma omp single // Includes implicit synchronization
-        Quicksort(a, 0, size - 1);
+        { 
+            switch(exec_type){
+            case 1:
+                Quicksort(a, 0, size - 1);
+                break;
+            case 2:
+                Quicksort_EX5(a, 0, size-1, X);
+                break;
+            }
+        }
     }
     double end = omp_get_wtime();
     printf("%lf\t", end - start);
