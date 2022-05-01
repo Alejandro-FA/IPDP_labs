@@ -83,6 +83,7 @@ int main(int argc, char const *argv[])
 {
     if(argc != 4){
         printf("The input format is: ' filename to read, number of exercises, number of executions per exercise '.\n");
+        printf("Example: ./mean_calc 2_quicksort/out_sort_ex4.txt 10 5 >> 2_quicksort/means_ex4.txt \n");
         return -1;
     }
 
