@@ -8,7 +8,8 @@ int* a;
 int* b;
 
 // Allocate heap memory for the specified vector and initialize it with random numbers
-void init_vectors(int size){
+void init_vectors(int size) {
+    srand(1);
     a = malloc(sizeof(int) * size);
     b = malloc(sizeof(int) * size);
     for(int i = 0; i < size; i++ ){
