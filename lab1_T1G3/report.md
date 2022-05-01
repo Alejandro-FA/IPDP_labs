@@ -47,7 +47,7 @@ All the times presented in the previous table correspond to an average of 5 runs
 
 > Change the flag *`-O2`* in the Makefile for *`-O3`*. Submit a job executing the code with a vector size of 100M integers and obtain results for 1, 2, 4 and 8 cores with the options of Exercise 2 and Exercise 3. Compare the results. What does *`-O3`* do?
 
-
+The flag `-O3`just sets a better optimization level for the compiler. 
 
 ## Task 2: Sorting with Quicksort
 
@@ -75,8 +75,16 @@ All the times presented in the previous table correspond to an average of 5 runs
 
 > Use *`gprof`* to get a profile of the code. What is the function that takes more time? You may need to modify the Makefile and the job script.
 
+The function that takes more time is the `Fitness()` one. 
 
 
 ### Exercise 6.2
 
 > Parallelize the most time consuming function and run the code requesting 4 cores. Is the new code faster?
+
+After parallelizing the function `Fitness()` we can observe that the new code is quite faster than the previous one. The parallelization we have implemented consists on:
+
+1. Dividing the iterations of the for loop between 4 threads.
+2. Applying a reduction to the variable `attack`.
+3. Setting a static scheduling, which is the one that improves the performance the most in this case. 
+
