@@ -6,7 +6,7 @@
 /********************** AUXILIARY FUNCTIONS *********************/
 void incorrect_arguments() {
     printf("3 arguments are required:\n");
-    printf("   The first argument is the mode of execution. Possible values are '1' (exercise 4) and '2' (exercise 5).\n");
+    printf("   The first argument is the mode of execution. Possible values are '1' (sequential), '2' (parallelized with tasks) and '3' (tasks with if clause).\n");
     printf("   The second argument is the number of threads to use. It cannot be greater than 24.\n");
     printf("   The third argument defines the size of the array to sort. It must be a positive integer value.\n");
     printf("   The fourth argument is X, the condition value for exercise 5. Ignored for execution mode 1.\n");
@@ -35,14 +35,23 @@ int partition(int *a, int lo, int hi){
     return j;
 }
 
-void Quicksort(int *a, int lo, int hi){
+void Quicksort_SEQ(int *a, int lo, int hi){
+    if ( lo < hi ) {
+        int p = partition(a, lo, hi);
+        
+        {(void) Quicksort_SEQ(a, lo, p - 1);} // Left branch
+        {(void) Quicksort_SEQ(a, p + 1, hi);} // Right branch
+    }
+}
+
+void Quicksort_PAR(int *a, int lo, int hi){
     if ( lo < hi ) {
         int p = partition(a, lo, hi);
         
         #pragma omp task
-        { (void) Quicksort(a, lo, p - 1); } // Left subarray
+        { (void) Quicksort_PAR(a, lo, p - 1); } // Left subarray
         #pragma omp task
-        { (void) Quicksort(a, p + 1, hi); } // Right subarray
+        { (void) Quicksort_PAR(a, p + 1, hi); } // Right subarray
     }
 }
 
@@ -70,8 +79,8 @@ int main(int argc, char *argv[])
     int X = atoi(argv[4]);
     
     // Check that arguments are correct
-    if (exec_type != 1 && exec_type != 2) {
-        printf("The execution type is incorrect!\nPossible arguments are '1' (exercise 4) and '2' (exercise 5).\n");
+    if (exec_type != 1 && exec_type != 2 && exec_type != 3) {
+        printf("The execution type is incorrect!\nPossible arguments are '1' (sequential), '2' (parallelized with tasks) and '3' (tasks with if clause).\n");
         return -1;
     }
     if (num_threads < 1 || num_threads > 24) {
@@ -82,7 +91,7 @@ int main(int argc, char *argv[])
         printf("The second argument defines the size of the array to sort. It must be a positive integer value.\n");
         return -1;
     }
-    if(exec_type == 2 && X < 1) {
+    if(exec_type == 3 && X < 1) {
         printf("The third argument defines X. It must be a positive (>0) integer value.\n");
         return -1;
     }
@@ -92,22 +101,26 @@ int main(int argc, char *argv[])
     int *a = malloc(size * sizeof(int));
     for (int i = 0; i < size; i++) {a[i] = rand() % size;}
 
-
     // Parallelize Quicksort with tasks
     double start = omp_get_wtime();
-    #pragma omp parallel num_threads(num_threads) // We create threads outside to avoid massive overhead
-    {
-        #pragma omp single // Includes implicit synchronization
-        { 
-            switch(exec_type){
-            case 1:
-                Quicksort(a, 0, size - 1);
-                break;
-            case 2:
-                Quicksort_EX5(a, 0, size-1, X);
-                break;
+    switch (exec_type) {
+        case 1:
+            Quicksort_SEQ(a, 0, size - 1);
+            break;
+        case 2:
+            #pragma omp parallel num_threads(num_threads) // We create threads outside to avoid massive overhead
+            {
+                #pragma omp single // Includes implicit synchronization
+                { Quicksort_PAR(a, 0, size - 1); }
             }
-        }
+            break;
+        case 3:
+            #pragma omp parallel num_threads(num_threads) // We create threads outside to avoid massive overhead
+            {
+                #pragma omp single // Includes implicit synchronization
+                { Quicksort_EX5(a, 0, size - 1, X); }
+            }
+            break;
     }
     double end = omp_get_wtime();
     printf("%lf\t", end - start);

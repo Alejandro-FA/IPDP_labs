@@ -23,7 +23,7 @@ do
             echo "Size: ${size}, Threads: ${nthreads}, X: ${X}"
             for (( i = 0; i < $nruns; i++ ))
             do
-                ./a.out 2 $nthreads $size $X
+                ./a.out 3 $nthreads $size $X
             done
             echo "--------------------"
         done

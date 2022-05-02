@@ -16,12 +16,19 @@ nruns=5
 
 for size in 1000000 100000000
 do
+    echo "Size: ${size}, Sequential execution"
+    for (( i = 0; i < $nruns; i++ ))
+    do
+        ./a.out 1 1 $size 0
+    done
+    echo "--------------------"
+
     for nthreads in 1 2 4 8 16
     do
         echo "Size: ${size}, Threads: ${nthreads}"
         for (( i = 0; i < $nruns; i++ ))
         do
-            ./a.out 1 $nthreads $size 0
+            ./a.out 2 $nthreads $size 0
         done
         echo "--------------------"
     done
