@@ -12,7 +12,7 @@ module load GCC/10.2.0
 
 make clean >> out_sort.err && make >> out_sort.err || exit 1 
 
-nruns=1
+nruns=5
 
 for size in 1000000 100000000
 do

@@ -50,9 +50,9 @@ void Quicksort_EX5(int *a, int lo, int hi, int X) {
     if ( lo < hi ) {
         int p = partition(a, lo, hi);
         
-        #pragma omp task if (hi - lo <= X)
+        #pragma omp task if (hi - lo >= X)
         { (void) Quicksort_EX5(a, lo, p - 1, X); } // Left subarray
-        #pragma omp task if (hi - lo <= X)
+        #pragma omp task if (hi - lo >= X)
         { (void) Quicksort_EX5(a, p + 1, hi, X); } // Right subarray
     }
 }
