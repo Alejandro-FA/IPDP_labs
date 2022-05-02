@@ -12,7 +12,7 @@ module load GCC/10.2.0
 
 make clean >> out_sort.err && make >> out_sort.err || exit 1 
 
-nruns=1
+nruns=5
 
 for size in 1000000 100000000
 do
@@ -23,7 +23,7 @@ do
             echo "Size: ${size}, Threads: ${nthreads}, X: ${X}"
             for (( i = 0; i < $nruns; i++ ))
             do
-                ./a.out 2 $nthreads $size $X
+                ./a.out 3 $nthreads $size $X
             done
             echo "--------------------"
         done
