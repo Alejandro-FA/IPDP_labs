@@ -79,23 +79,63 @@ All the times presented in the previous table correspond to an average of 5 runs
 
 The flag `-O3 ` just sets the most extreme optimization level for the compiler, and by comparing with the previous results we can guess that it has enabled vectorization by default. This is undeniably very handy, since it saves time to the programmer, although it is curious to see that for the vectorized case the results are consistently slightly worse.
 
+
+
 ## Task 2: Sorting with Quicksort
 
 ### Exercise 4.2
 
 > Submit a job executing the code with a vector size of 1M doubles and obtain results for 1, 2, 4, 8 and 16 cores (you can use the sample job file dotp sort.cmd as a base for your job files). How does it scale? Plot the speedup.
 
+| Number of threads | Sequential time (s) | Parallel time (s) |
+| ----------------- | ------------------- | ----------------- |
+| 1                 | 0.084303            | 0.091567          |
+| 2                 | -                   | 0.048944          |
+| 4                 | -                   | 0.031922          |
+| 8                 | -                   | 0.034936          |
+| 16                | -                   | 0.054966          |
 
+All the execution times presented in the previous table correspond to an average of 5 runs.
 
 ### Exercise 4.3
 
 > Submit a job executing the code with a vector size of 100M doubles and obtain results for 1, 2, 4, 8 and 16 cores (you can use the sample job file dotp sort.cmd as a base for your job files). Does it scale better or worse than before? Why?
 
+| Number of threads | Sequential time (s) | Parallel time (s) |
+| ----------------- | ------------------- | ----------------- |
+| 1                 | 10.841772           | 11.534906         |
+| 2                 | -                   | 5.812959          |
+| 4                 | -                   | 3.069949          |
+| 8                 | -                   | 2.058277          |
+| 16                | -                   | 2.227138          |
 
+All the execution times presented in the previous table correspond to an average of 5 runs.
 
 ### Exercise 5
 
-> Add the clause `if(hi − lo ≤ (X))` to the pragmas of the recursive calls to *Quicksort* and repeat the tests in Exercises 4.2 and 4.3. Try different values for (X) (5, 10 and 1000) and different sizes for the problem. What do you observe? What does it do? Add a table to your report with the different values you have obtained.
+> Add the clause `if(hi − lo >= (X))` to the pragmas of the recursive calls to *Quicksort* and repeat the tests in Exercises 4.2 and 4.3. Try different values for (X) (5, 10 and 1000) and different sizes for the problem. What do you observe? What does it do? Add a table to your report with the different values you have obtained.
+
+For a vector size of 1M:
+
+| Number of threads | $X=5$ (s) | $X=100$ (s) | $X=1000$ (s) |
+| ----------------- | --------- | ----------- | ------------ |
+| 1                 | 0.092391  | 0.093580    | 0.094850     |
+| 2                 | 0.049186  | 0.049492    | 0.049750     |
+| 4                 | 0.031520  | 0.028737    | 0.026745     |
+| 8                 | 0.031804  | 0.022674    | 0.015744     |
+| 16                | 0.042344  | 0.026979    | 0.013781     |
+
+For a vector size of 100M:
+
+| Number of threads | $X=5$ (s) | $X=100$ (s) | $X=1000$ (s) |
+| ----------------- | --------- | ----------- | ------------ |
+| 1                 | 11.854046 | 11.772560   | 11.817773    |
+| 2                 | 5.927430  | 5.967388    | 5.939801     |
+| 4                 | 3.121040  | 3.117735    | 3.092892     |
+| 8                 | 2.005139  | 1.846142    | 1.750238     |
+| 16                | 1.963345  | 1.374746    | 1.248192     |
+
+All the execution times presented in the previous table correspond to an average of 5 runs.
 
 
 
