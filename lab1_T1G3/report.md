@@ -97,6 +97,10 @@ The flag `-O3 ` just sets the most extreme optimization level for the compiler, 
 
 All the execution times presented in the previous table correspond to an average of 5 runs.
 
+<img src="report.assets/ex4-1.png" alt="ex4-1" style="zoom:80%;" />
+
+As we can observe, until 4 processors the scaling is pretty good but for 8 and 16 processors it is not even better than before. We consider that this might happen due to the fact that the overhead of managing all the threads is more expensive than the algorithm itself.
+
 ### Exercise 4.3
 
 > Submit a job executing the code with a vector size of 100M doubles and obtain results for 1, 2, 4, 8 and 16 cores (you can use the sample job file dotp sort.cmd as a base for your job files). Does it scale better or worse than before? Why?
@@ -110,6 +114,10 @@ All the execution times presented in the previous table correspond to an average
 | 16                | -                   | 2.227138          |
 
 All the execution times presented in the previous table correspond to an average of 5 runs.
+
+<img src="report.assets/ex4-2.png" alt="ex4-2" style="zoom:80%;" />
+
+In this case, as the size of the array is much larger we can observe that until 8 processors the scaling is pretty good, since the problem difficulty has increased. On the other hand, when we move up to 16 processors we can see how the speedup is not better than before due to the overhead of managing all the threads, as we have already seen. 
 
 ### Exercise 5
 
@@ -137,7 +145,7 @@ For a vector size of 100M:
 
 All the execution times presented in the previous table correspond to an average of 5 runs.
 
-
+This condition forces the algorithm to sort a partition of the array if and only if the size of this part is greater than the given threashold $X$. Therefore, if we increase the size of $X$ more partitions of the array will be not ordered and the algorithm will be faster, as we can observe in the tables.
 
 ## Task 3: N-queens with Genetic Algorithm
 
@@ -145,7 +153,7 @@ All the execution times presented in the previous table correspond to an average
 
 > Use *`gprof`* to get a profile of the code. What is the function that takes more time? You may need to modify the Makefile and the job script.
 
-The function that takes more time is the `Fitness()` one. 
+The function that takes more time is the `Fitness()` one, which makes sense at first sight since it has a double loop that traverses all the array. 
 
 
 ### Exercise 6.2
