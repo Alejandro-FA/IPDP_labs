@@ -97,9 +97,9 @@ The flag `-O3 ` just sets the most extreme optimization level for the compiler, 
 
 All the execution times presented in the previous table correspond to an average of 5 runs.
 
-<img src="report.assets/ex4-1.png" alt="ex4-1" style="zoom:80%;" />
+<img src="report.assets/ex4-1.png" alt="ex4-1" style="zoom:50%;" />
 
-As we can observe, until 4 processors the scaling is pretty good but for 8 and 16 processors it is not even better than before. We consider that this might happen due to the fact that the overhead of managing all the threads is more expensive than the algorithm itself.
+As we can observe, until 4 processors the scaling is pretty good but for 8 and 16 processors it is even worse than with 4 threads. We consider that this might happen due to the fact that the overhead of managing all the threads / tasks is more expensive than the algorithm itself.
 
 ### Exercise 4.3
 
@@ -115,9 +115,9 @@ As we can observe, until 4 processors the scaling is pretty good but for 8 and 1
 
 All the execution times presented in the previous table correspond to an average of 5 runs.
 
-<img src="report.assets/ex4-2.png" alt="ex4-2" style="zoom:80%;" />
+<img src="report.assets/ex4-2.png" alt="ex4-2" style="zoom:50%;" />
 
-In this case, as the size of the array is much larger we can observe that until 8 processors the scaling is pretty good, since the problem difficulty has increased. On the other hand, when we move up to 16 processors we can see how the speedup is not better than before due to the overhead of managing all the threads, as we have already seen. 
+In this case, as the size of the array is much larger we can observe that until 8 processors the scaling is pretty good, since the problem difficulty has increased. On the other hand, when we move up to 16 processors we can see how the speedup is worse than before due to the overhead of managing all the threads / tasks, as we have already seen. 
 
 ### Exercise 5
 
@@ -145,7 +145,11 @@ For a vector size of 100M:
 
 All the execution times presented in the previous table correspond to an average of 5 runs.
 
-This condition forces the algorithm to sort a partition of the array if and only if the size of this part is greater than the given threashold $X$. Therefore, if we increase the size of $X$ more partitions of the array will be not ordered and the algorithm will be faster, as we can observe in the tables.
+When evaluated to false, this if condition generates an undeferred task, which suspends execution of the generating thread until the task is completed. We assume that this is used to avoid the concurrent scheduling of a lot of tasks at the end of the algorithm, in order to avoid having too big of an overhead.
+
+As demonstrated by the results obtained, which are better than those of exercise 4.3 in all cases, the if clause is effective and the running time is noticeably reduced. The value of $X$ of 1000 seems to provide the best results.
+
+
 
 ## Task 3: N-queens with Genetic Algorithm
 
