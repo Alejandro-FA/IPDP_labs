@@ -1,0 +1,2 @@
+rm -f a.out
+gcc -std=c99 -std=gnu11 -Wall -O3 -fopenmp quicksort.c -lm -o a.out

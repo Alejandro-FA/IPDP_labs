@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH --job-name=test
-#SBATCH --output=out_sort_ex5.txt
+#SBATCH --output=out_sort_ex5.out
 #SBATCH --error=out_sort.err
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=16

@@ -1,0 +1,47 @@
+rm -f a.out
+gcc -std=c99 -std=gnu11 -Wall -march=native -fopenmp -fopt-info-vec-{optimized,missed} -O3 dotp.c -lm -o a.out
+dotp.c: In function ‘dot_product’:
+dotp.c:27:31: warning: format ‘%d’ expects argument of type ‘int’, but argument 2 has type ‘long unsigned int’ [-Wformat=]
+   27 |         printf("Size of int: %d\n", sizeof(int));
+      |                              ~^     ~~~~~~~~~~~
+      |                               |     |
+      |                               int   long unsigned int
+      |                              %ld
+dotp.c:32:46: optimized: loop vectorized using 32 byte vectors
+dotp.c:32:46: optimized: loop vectorized using 16 byte vectors
+dotp.c:31:43: missed: statement clobbers memory: __atomic_fetch_add_4 (_28, prephitmp_65, 0);
+dotp.c:35:17: optimized: loop vectorized using 32 byte vectors
+dotp.c:36:46: optimized: loop vectorized using 32 byte vectors
+dotp.c:35:17: missed: statement clobbers memory: __builtin_memset (&D.3978, 0, _61);
+dotp.c:35:48: missed: statement clobbers memory: __atomic_fetch_add_4 (_44, prephitmp_66, 0);
+dotp.c:15:5: missed: couldn't vectorize loop
+dotp.c:16:23: missed: statement clobbers memory: _5 = rand ();
+dotp.c:12:5: missed: statement clobbers memory: srand (1);
+dotp.c:13:9: missed: statement clobbers memory: _3 = malloc (_2);
+dotp.c:14:9: missed: statement clobbers memory: _4 = malloc (_2);
+dotp.c:16:23: missed: statement clobbers memory: _5 = rand ();
+dotp.c:17:23: missed: statement clobbers memory: _13 = rand ();
+dotp.c:28:9: optimized: loop vectorized using 32 byte vectors
+dotp.c:28:9: optimized: loop vectorized using 16 byte vectors
+dotp.c:27:9: missed: statement clobbers memory: printf ("Size of int: %d\n", 4);
+dotp.c:22:5: missed: statement clobbers memory: __builtin_GOMP_parallel (dot_product._omp_fn.0, &.omp_data_o.12, num_threads.20_17, 0);
+dotp.c:22:5: missed: statement clobbers memory: __builtin_GOMP_parallel (dot_product._omp_fn.1, &.omp_data_o.16, num_threads.24_11, 0);
+dotp.c:43:5: missed: statement clobbers memory: __builtin_puts (&"3 arguments are required:"[0]);
+dotp.c:44:5: missed: statement clobbers memory: __builtin_puts (&"   The first argument is the mode of execution. Possible values are \'1\' (sequential), \'2\' (parallel) and \'3\' (parallel with vectorization)."[0]);
+dotp.c:45:5: missed: statement clobbers memory: __builtin_puts (&"   The second argument is the number of threads to use. Ignored for sequential execution."[0]);
+dotp.c:46:5: missed: statement clobbers memory: __builtin_puts (&"   The third argument defines the size of the vectors. It must be a positive integer value. "[0]);
+dotp.c:53:22: missed: statement clobbers memory: incorrect_arguments ();
+/usr/include/stdlib.h:280:16: missed: statement clobbers memory: _31 = strtol (_1, 0B, 10);
+/usr/include/stdlib.h:280:16: missed: statement clobbers memory: _33 = strtol (_2, 0B, 10);
+/usr/include/stdlib.h:280:16: missed: statement clobbers memory: _35 = strtol (_3, 0B, 10);
+dotp.c:62:9: missed: statement clobbers memory: __builtin_puts (&"The execution type is incorrect!\nPossible arguments are \'1\' (sequential), \'2\' (parallel) and \'3\' (parallel with vectorization)"[0]);
+dotp.c:66:9: missed: statement clobbers memory: __builtin_puts (&"The second argument defines the number of threads and it must be a positive (>0) integer value.\nUsing default value of 1..."[0]);
+dotp.c:70:9: missed: statement clobbers memory: __builtin_puts (&"The third argument defines the size of the vectors. It must be a positive (>0) integer value. "[0]);
+dotp.c:75:5: missed: statement clobbers memory: init_vectors (_56);
+dotp.c:76:20: missed: statement clobbers memory: start_19 = omp_get_wtime ();
+dotp.c:77:18: missed: statement clobbers memory: result_21 = dot_product (_56, _32, num_threads_8);
+dotp.c:78:18: missed: statement clobbers memory: end_23 = omp_get_wtime ();
+dotp.c:81:5: missed: statement clobbers memory: printf ("%.4e\t%i\n", runtime_24, result_21);
+dotp.c:84:5: missed: statement clobbers memory: free (a.27_6);
+dotp.c:85:5: missed: statement clobbers memory: free (b.28_7);
+/usr/include/stdlib.h:280:16: missed: statement clobbers memory: _51 = strtol (_49, 0B, 10);

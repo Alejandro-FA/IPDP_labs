@@ -1,0 +1,7 @@
+rm -f a.out
+gcc -std=c99 -Wall -fopenmp nqueens.c -lm -o a.out
+nqueens.c: In function ‘Fitness’:
+nqueens.c:28:32: error: condition expression refers to iteration variable ‘j’
+   28 |         for (int k = (size-1); k > j; k--) {
+      |                                ^
+make: *** [all] Error 1
