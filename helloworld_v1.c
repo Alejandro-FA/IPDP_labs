@@ -5,16 +5,20 @@
 #define MAX_MESSAGE_SIZE 400
 
 void printMessage(char* message, MPI_Comm comm) {
-    int comm_rank;
+    MPI_Status status;
+    int comm_rank, comm_size;
     MPI_Comm_rank(comm, &comm_rank);
+    MPI_Comm_size(comm, &comm_size);
 
-    printf("%s\n", message);
-    fflush(stdout);
-    // MPI_Barrier(comm);
-    // if (comm_rank == 0) {
-    //     printf("---------------------\n\n");
-    //     fflush(stdout);
-    // }
+    if (comm_rank == 0) {
+        printf("%s", message);
+        for (int i = 0; i < comm_size - 1; ++i) {
+            MPI_Recv(message, MAX_MESSAGE_SIZE, MPI_CHAR, MPI_ANY_SOURCE, 0, comm, &status);
+            printf("%s", message);
+        }
+        printf("---------------------\n\n");
+    }
+    else MPI_Send(message, MAX_MESSAGE_SIZE, MPI_CHAR, 0, 0, comm);
 }
 
 int main(int argc, char ** argv)
@@ -32,13 +36,11 @@ int main(int argc, char ** argv)
     // Set message to print
     char message[MAX_MESSAGE_SIZE];
     snprintf(message, MAX_MESSAGE_SIZE,
-        "Hi, I'm rank %d. My comunicator is %s and has a size of %d processes.",
+        "Hi, I'm rank %d. My comunicator is %s and has a size of %d processes.\n",
         world_rank, world_name, world_size);
 
     // Print message
     printMessage(message, MPI_COMM_WORLD);
-    MPI_Barrier(MPI_COMM_WORLD);
-
 
     /******************************** PHASE 2 ********************************/
     int  color, split_rank, split_size;
@@ -56,13 +58,11 @@ int main(int argc, char ** argv)
 
     // Set message to print
     snprintf(message, MAX_MESSAGE_SIZE,
-        "Hi, I was rank %d in comunicator %s which had %d processes. Now I'm rank %d in comunicator %s_%d which has %d processes.",
+        "Hi, I was rank %d in comunicator %s which had %d processes. Now I'm rank %d in comunicator %s_%d which has %d processes.\n",
         world_rank, world_name, world_size, split_rank, split_name, color, split_size);
 
     // Print message
     printMessage(message, MPI_COMM_WORLD);
-    MPI_Barrier(MPI_COMM_WORLD);
-
 
     /******************************** PHASE 3 ********************************/
     MPI_Group world_group;
@@ -85,11 +85,10 @@ int main(int argc, char ** argv)
         MPI_Comm_rank (EVEN_COMM, &even_rank);
         MPI_Comm_size (EVEN_COMM, &even_size);
         snprintf(message, MAX_MESSAGE_SIZE,
-            "Hi, I was rank %d in comunicator %s_%d which had %d processes. Now I'm rank %d in communicator %s which has %d processes.",
+            "Hi, I was rank %d in comunicator %s_%d which had %d processes. Now I'm rank %d in communicator %s which has %d processes. \n",
             split_rank, split_name, color, split_size, even_rank, even_name, even_size );
         printMessage(message, EVEN_COMM);
     }
-    MPI_Barrier(MPI_COMM_WORLD);
 
 
     /******************************** PHASE 4 ********************************/
@@ -107,14 +106,14 @@ int main(int argc, char ** argv)
         MPI_Comm_rank (ODD_COMM, &odd_rank);
         MPI_Comm_size (ODD_COMM, &odd_size);
         snprintf(message, MAX_MESSAGE_SIZE,
-            "Hi, I was rank %d in comunicator %s which had %d processes. Now I'm rank %d in communicator %s which has %d processes.", 
+            "Hi, I was rank %d in comunicator %s which had %d processes. Now I'm rank %d in communicator %s which has %d processes. \n", 
             world_rank, world_name, world_size, odd_rank, odd_name, odd_size );
         printMessage(message, ODD_COMM);
     }
-    MPI_Barrier(MPI_COMM_WORLD);
 
 
     /************************** Close MPI Framework **************************/
+    MPI_Barrier(MPI_COMM_WORLD);
     free(even_ranks);
     if(world_rank % 2 == 0) {
         MPI_Group_free(&even_group);
