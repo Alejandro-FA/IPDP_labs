@@ -1,6 +1,6 @@
 DIR := ${CURDIR}
 
-CFLAGS = -std=c99 -std=gnu11 -Wall -fopenmp
+CFLAGS = -std=c99 -std=gnu11 -Wall -fopenmp -O3
 LIBS = -lm
 COMPFLAGS = 
 

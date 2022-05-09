@@ -3,6 +3,8 @@
 #include <omp.h> // TODO: Is it necessary? Check if performance improves when changing num_threads
 #include "mpi.h"
 
+#define ind(i, j, nx) (((i)*(nx)) + (j))
+
 double dot_product(int p_size, double* array1, double* array2, int num_threads) {
     double sum = 0.0;
     #pragma omp parallel for simd reduction(+: sum) num_threads(num_threads)
@@ -53,27 +55,13 @@ int main() {
     MPI_Comm_size(MPI_COMM_WORLD, &world_size);
 
     // Read the corresponding section of both arrays
-    char file1_name[100] = {"/shared/Labs/Lab_2/array_p.bin\0"};
-    char file2_name[100] = {"/shared/Labs/Lab_2/array_q.bin\0"};
+    char file1_name[100] = {"/shared/Labs/Lab_2/matrix.bin\0"};
+    char file2_name[100] = {"/shared/Labs/Lab_2/matrix_vector.bin\0"};
     int p_size1, p_size2;
-    // TODO: compute execution time
     double * buf_array1 = par_read(file1_name, &p_size1, world_rank, world_size);
     double * buf_array2 = par_read(file2_name, &p_size2, world_rank, world_size);
     
-    // Compute the dot product using OpenMP
-    int nthreads = 4;
-    double sum = 0.0;
-    if (p_size1 == p_size2) {
-        sum = dot_product(p_size1, buf_array1, buf_array2, nthreads);
-        printf("Process with rank %d: sum = %lf\n", world_rank, sum);
-    } else printf("Process %d: array sizes do not match. Array 1 size: %d, array 2 size: %d\n", world_rank, p_size1, p_size2);
-    fflush(stdout);
-
-    // Combine the results of each process
-    double solution = 0.0;
-    MPI_Reduce( &sum, &solution, 4, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
-    if (world_rank == 0) printf("The result of the dot product is %lf\n", solution);
-
+    
     // Free memory allocated in the heap and close framework
     free(buf_array1);
     free(buf_array2);

@@ -3,6 +3,7 @@
 #include "mpi.h"
 
 #define MAX_MESSAGE_SIZE 400
+// #define MAX_MESSAGE_SIZE MPI_MAX_OBJECT_NAME
 
 void printMessage(char* message, MPI_Comm comm) {
     int comm_rank;
@@ -24,7 +25,7 @@ int main(int argc, char ** argv)
     /******************************** PHASE 1 ********************************/
     // Get world info
     int world_rank, world_size;
-    char world_name[100] = {"MPI_COMM_WORLD"};
+    char world_name[MPI_MAX_OBJECT_NAME] = {"MPI_COMM_WORLD"};
     MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
     MPI_Comm_size(MPI_COMM_WORLD, &world_size);
     MPI_Comm_set_name(MPI_COMM_WORLD, world_name);
@@ -43,7 +44,7 @@ int main(int argc, char ** argv)
     /******************************** PHASE 2 ********************************/
     int  color, split_rank, split_size;
     MPI_Comm SPLIT_COMM;
-    char split_name[100] = {"SPLIT_COMM"};
+    char split_name[MPI_MAX_OBJECT_NAME] = {"SPLIT_COMM"};
     
     // Determine color based on row
     color = world_rank / 4;
@@ -79,7 +80,7 @@ int main(int argc, char ** argv)
 
     // Print message
     int even_rank, even_size;
-    char even_name[100] = {"EVEN_COMM"};
+    char even_name[MPI_MAX_OBJECT_NAME] = {"EVEN_COMM"};
 
     if(world_rank % 2 == 0) {
         MPI_Comm_rank (EVEN_COMM, &even_rank);
@@ -101,7 +102,7 @@ int main(int argc, char ** argv)
 
     // Print message
     int odd_rank, odd_size;
-    char odd_name[100] = {"ODD_COMM"};
+    char odd_name[MPI_MAX_OBJECT_NAME] = {"ODD_COMM"};
 
     if(world_rank % 2 != 0) {
         MPI_Comm_rank (ODD_COMM, &odd_rank);
