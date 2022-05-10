@@ -10,7 +10,7 @@ void printMessage(char* message, MPI_Comm comm) {
     MPI_Comm_rank(comm, &comm_rank);
 
     printf("%s\n", message);
-    fflush(stdout);
+    // fflush(stdout);
     // MPI_Barrier(comm);
     // if (comm_rank == 0) {
     //     printf("---------------------\n\n");
@@ -38,6 +38,7 @@ int main(int argc, char ** argv)
 
     // Print message
     printMessage(message, MPI_COMM_WORLD);
+    fflush(stdout);
     MPI_Barrier(MPI_COMM_WORLD);
 
 
@@ -62,6 +63,7 @@ int main(int argc, char ** argv)
 
     // Print message
     printMessage(message, MPI_COMM_WORLD);
+    fflush(stdout);
     MPI_Barrier(MPI_COMM_WORLD);
 
 
@@ -90,6 +92,7 @@ int main(int argc, char ** argv)
             split_rank, split_name, color, split_size, even_rank, even_name, even_size );
         printMessage(message, EVEN_COMM);
     }
+    fflush(stdout);
     MPI_Barrier(MPI_COMM_WORLD);
 
 
@@ -112,6 +115,7 @@ int main(int argc, char ** argv)
             world_rank, world_name, world_size, odd_rank, odd_name, odd_size );
         printMessage(message, ODD_COMM);
     }
+    fflush(stdout);
     MPI_Barrier(MPI_COMM_WORLD);
 
 
