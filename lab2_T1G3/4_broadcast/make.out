@@ -1,0 +1,33 @@
+rm -f *.o a.out
+mpicc -c matrix.c -o matrix.o -std=c99 -std=gnu11 -Wall -fopenmp -O3 
+rm -f *.o a.out
+mpicc -c matrix.c -o matrix.o -std=c99 -std=gnu11 -Wall -fopenmp -O3 
+mpicc -o a.out  matrix.o -lm -std=c99 -std=gnu11 -Wall -fopenmp -O3
+rm -f *.o a.out
+mpicc -c matrix.c -o matrix.o -std=c99 -std=gnu11 -Wall -fopenmp -O3 
+rm -f *.o a.out
+mpicc -c matrix.c -o matrix.o -std=c99 -std=gnu11 -Wall -fopenmp -O3 
+rm -f *.o a.out
+mpicc -c matrix.c -o matrix.o -std=c99 -std=gnu11 -Wall -fopenmp -O3 
+mpicc -o a.out  matrix.o -lm -std=c99 -std=gnu11 -Wall -fopenmp -O3
+rm -f *.o a.out
+mpicc -c matrix.c -o matrix.o -std=c99 -std=gnu11 -Wall -fopenmp -O3 
+mpicc -o a.out  matrix.o -lm -std=c99 -std=gnu11 -Wall -fopenmp -O3
+rm -f *.o a.out
+mpicc -c matrix.c -o matrix.o -std=c99 -std=gnu11 -Wall -fopenmp -O3 
+mpicc -o a.out  matrix.o -lm -std=c99 -std=gnu11 -Wall -fopenmp -O3
+rm -f *.o a.out
+mpicc -c matrix.c -o matrix.o -std=c99 -std=gnu11 -Wall -fopenmp -O3 
+mpicc -o a.out  matrix.o -lm -std=c99 -std=gnu11 -Wall -fopenmp -O3
+rm -f *.o a.out
+mpicc -c matrix.c -o matrix.o -std=c99 -std=gnu11 -Wall -fopenmp -O3 
+mpicc -o a.out  matrix.o -lm -std=c99 -std=gnu11 -Wall -fopenmp -O3
+rm -f *.o a.out
+mpicc -c matrix.c -o matrix.o -std=c99 -std=gnu11 -Wall -fopenmp -O3 
+mpicc -o a.out  matrix.o -lm -std=c99 -std=gnu11 -Wall -fopenmp -O3
+rm -f *.o a.out
+mpicc -c matrix.c -o matrix.o -std=c99 -std=gnu11 -Wall -fopenmp -O3 
+mpicc -o a.out  matrix.o -lm -std=c99 -std=gnu11 -Wall -fopenmp -O3
+rm -f *.o a.out
+mpicc -c matrix.c -o matrix.o -std=c99 -std=gnu11 -Wall -fopenmp -O3 
+mpicc -o a.out  matrix.o -lm -std=c99 -std=gnu11 -Wall -fopenmp -O3
