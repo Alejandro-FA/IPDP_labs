@@ -19,7 +19,8 @@ int main(int argc, char ** argv)
     // Print message
     printf("Hi, I'm rank %d. My comunicator is %s and has a size of %d processes.\n",
         world_rank, world_name, world_size);
-    // fflush(stdout);
+    fflush(stdout);
+    sleep(1);
     MPI_Barrier(MPI_COMM_WORLD);
 
 
@@ -40,7 +41,8 @@ int main(int argc, char ** argv)
     // Print message
     printf("Hi, I was rank %d in comunicator %s which had %d processes. Now I'm rank %d in comunicator %s_%d which has %d processes.\n",
         world_rank, world_name, world_size, split_rank, split_name, color, split_size);
-    // fflush(stdout);
+    fflush(stdout);
+    sleep(1);
     MPI_Barrier(MPI_COMM_WORLD);
 
 
@@ -67,7 +69,8 @@ int main(int argc, char ** argv)
         printf("Hi, I was rank %d in comunicator %s_%d which had %d processes. Now I'm rank %d in communicator %s which has %d processes.\n",
             split_rank, split_name, color, split_size, even_rank, even_name, even_size );
     }
-    // fflush(stdout);
+    fflush(stdout);
+    sleep(1);
     MPI_Barrier(MPI_COMM_WORLD);
 
 
@@ -88,7 +91,8 @@ int main(int argc, char ** argv)
         printf("Hi, I was rank %d in comunicator %s which had %d processes. Now I'm rank %d in communicator %s which has %d processes.\n", 
             world_rank, world_name, world_size, odd_rank, odd_name, odd_size );
     }
-    // fflush(stdout);
+    fflush(stdout);
+    sleep(1);
     MPI_Barrier(MPI_COMM_WORLD);
 
 

@@ -3,7 +3,7 @@
 #SBATCH --output=out_mv.out
 #SBATCH --error=out_mv.err
 #SBATCH --ntasks=4
-#SBATCH --cpus-per-task=1
+#SBATCH --cpus-per-task=4
 #SBATCH --time=00:00:10
 
 source /etc/profile.d/z00-global-profile.sh
@@ -14,5 +14,5 @@ module load OpenMPI/4.1.0-GCC-10.2.0
 
 make clean >> make.out && make >> make.out || exit 1 
 
-mpirun -np 1 ./a.out
+# mpirun -np 1 ./a.out
 mpirun -np 4 ./a.out

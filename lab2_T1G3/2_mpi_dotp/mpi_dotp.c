@@ -69,6 +69,7 @@ int main() {
     } else printf("Process %d: array sizes do not match. Array 1 size: %d, array 2 size: %d\n", world_rank, p_size1, p_size2);
     fflush(stdout);
 
+    // FIXME: Fix the number of threads in and outside the reduction
     // Combine the results of each process
     double solution = 0.0;
     MPI_Reduce( &sum, &solution, 4, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
