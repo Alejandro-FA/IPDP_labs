@@ -129,24 +129,24 @@ void bitmap(int *recv_buf, int total_entries, int row_size, int nprocs, int i){
 }
 
 
-int *parallel_read(char *input_file, int *proc_size, int rank, int nprocs){
+// int *parallel_read(char *input_file, int *proc_size, int rank, int nprocs){
     
-    int *a;
-    MPI_File my_file;
-    MPI_Offset filesize;
-    MPI_Status status;
+//     int *a;
+//     MPI_File my_file;
+//     MPI_Offset filesize;
+//     MPI_Status status;
     
-    MPI_File_open(MPI_COMM_WORLD, input_file, MPI_MODE_RDONLY, MPI_INFO_NULL, &my_file);
-    MPI_File_get_size(my_file, &filesize);
+//     MPI_File_open(MPI_COMM_WORLD, input_file, MPI_MODE_RDONLY, MPI_INFO_NULL, &my_file);
+//     MPI_File_get_size(my_file, &filesize);
     
-    filesize = filesize / sizeof(int);
-    (*proc_size) = filesize / nprocs;
-    a = malloc((*proc_size) * sizeof(int));
+//     filesize = filesize / sizeof(int);
+//     (*proc_size) = filesize / nprocs;
+//     a = malloc((*proc_size) * sizeof(int));
     
-    MPI_File_set_view(my_file, rank * (*proc_size) * sizeof(int), MPI_INT, MPI_INT, "native", MPI_INFO_NULL);
-    MPI_File_read(my_file, a, (*proc_size), MPI_INT, &status);
+//     MPI_File_set_view(my_file, rank * (*proc_size) * sizeof(int), MPI_INT, MPI_INT, "native", MPI_INFO_NULL);
+//     MPI_File_read(my_file, a, (*proc_size), MPI_INT, &status);
     
-    MPI_File_close(&my_file);
+//     MPI_File_close(&my_file);
     
-    return a;
-}
+//     return a;
+// }

@@ -15,8 +15,6 @@ void print_matrix(int size, int * matrix){
        printf("\n");
     }
     printf("\n");
-    
-    
 }
 
 int * new_matrix(int size, int rank){
@@ -28,7 +26,6 @@ int * new_matrix(int size, int rank){
            else matrix[ind(i,j,size)] = 0;
        }
     }
-
     return matrix;
 }
 
@@ -45,18 +42,29 @@ int main()
     
     
     int * matrix = new_matrix(world_size, world_rank);
-    if(world_rank == 0) print_matrix(world_size, matrix);
-
-    MPI_Datatype diagonal;
+    if(world_rank == 0) {
+        printf("Initial matrix (rank 0):\n");
+        print_matrix(world_size, matrix);
+    }
     
+    // Creation of the derived data type which will contain the diagonal elements of the matrix
+    MPI_Datatype diagonal;
     MPI_Type_vector (world_size, 1, world_size + 1, MPI_INT, &diagonal );
     MPI_Type_commit (&diagonal);
 
+    // Gathering all the diagonals from all the processes to process 0
     int * matrix_result = malloc(sizeof(int) * pow(world_size,2));
-    MPI_Gather ( &matrix[0], 4, diagonal, matrix_result, 4, diagonal, 0, MPI_COMM_WORLD);
+    MPI_Gather ( &matrix[0], 1, diagonal, matrix_result, world_size, MPI_INT, 0, MPI_COMM_WORLD);
 
+    // Print result
+    if(world_rank == 0) {
+        printf("Final matrix (rank 0):\n");
+        print_matrix(world_size, matrix_result);
+    }
+    
     // Free memory allocated in the heap and close framework
     free(matrix);
+    free(matrix_result);
     MPI_Type_free (&diagonal);
 
     MPI_Finalize();

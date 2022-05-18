@@ -11,6 +11,35 @@
 
 int     row_size;
 
+int * par_read(char * in_file, int * p_size, int rank, int nprocs ) {
+    MPI_File fh;
+    MPI_Offset filesize, bufsize;
+    MPI_Status status;
+
+    // Open specified file
+    MPI_File_open (MPI_COMM_WORLD, in_file, MPI_MODE_RDONLY, MPI_INFO_NULL, &fh);
+
+    // Get information about the opened file
+    MPI_File_get_size (fh, &filesize);
+    bufsize = filesize / nprocs;
+    *p_size = bufsize < filesize - rank*bufsize ? bufsize : filesize - rank*bufsize;
+    *p_size /= sizeof(int);
+
+    // Allocate buffer to store the doubles read from the file
+    int* buf = malloc ( bufsize );
+
+    // Read at the specific position depending on the rank of the process
+    MPI_File_seek (fh, rank*bufsize, MPI_SEEK_SET);
+    MPI_File_read (fh, buf, *p_size, MPI_INT, &status);
+
+    // Control print and return
+    printf("Process %d : first index %d value %d - last index %d value %d\n",
+        rank, rank*(*p_size), buf[0], (rank+1)*(*p_size)-1, buf[*p_size-1]);
+    MPI_File_close (&fh);
+
+    return buf;
+}
+
 /*
 * Everything starts from here.
 */
@@ -28,9 +57,7 @@ int main (int argc, char** argv){
     int local_entries;
     
     /* Ex 5.1 Read the binary file */
-    int *local_matrix = /* */
-    
-    
+    int *local_matrix = par_read(FILENAME, &local_entries, rank, nprocs);
     
     int *update_matrix = calloc(local_entries, sizeof(int));
     int total_entries = local_entries * nprocs;
@@ -50,7 +77,7 @@ int main (int argc, char** argv){
 
     
     /* Messaging variables */
-    MPI_Status stat;
+    MPI_Status stats[4];
     int prev;                       // Stores process previous neighbour
     int next;                       // Stores process next neighbour
 
@@ -63,22 +90,25 @@ int main (int argc, char** argv){
     else {
         
     /* Ex 5.2: Define neighbours */
-    
-    //
-    //
-    //
+        next = rank + 1;
+        prev = rank - 1;
+
+        if(rank == 0) prev = nprocs - 1;
+        if(rank == nprocs - 1) next = 0;
     }
     
     
     /* Ex 5.3: Make rank 0 print the problem */
-    
-    //
-    //
-    //
+    int * received_matrix = malloc(sizeof(int) * total_entries);
+    MPI_Gather ( local_matrix, local_entries, MPI_INT, received_matrix, local_entries, MPI_INT, 0, MPI_COMM_WORLD);
+
+    if(rank == 0){
+        bitmap(received_matrix, total_entries, row_size, nprocs, 0);
+        printf("Received matrix first element: %d, last element: %d", received_matrix[0], received_matrix[total_entries - 1]);
+    }
     
 
     /* Generations */
-
     for (i = 0; i < iter; i++){
         
         /* Get the buffer to send */
@@ -95,10 +125,14 @@ int main (int argc, char** argv){
         else {
             
             /* Ex 5.4: Communicate upper and lower rows to the neighbouring processes */
+            MPI_Request requests[4];
             
-            //
-            //
-            //
+            MPI_Isend ( lower_send, row_size, MPI_INT, next, 0, MPI_COMM_WORLD, &requests[0]);
+            MPI_Irecv ( lower_recv, row_size, MPI_INT, next, 1, MPI_COMM_WORLD, &requests[1]);
+            MPI_Isend ( upper_send, row_size, MPI_INT, prev, 1, MPI_COMM_WORLD, &requests[2]);
+            MPI_Irecv ( upper_recv, row_size, MPI_INT, prev, 0, MPI_COMM_WORLD, &requests[3]);
+
+            MPI_Waitall(4, requests, stats);
         }
 
         /* Update the values */
@@ -142,10 +176,14 @@ int main (int argc, char** argv){
 
     
     /* Ex 5.5: Output the final state */
+    MPI_Gather ( local_matrix, local_entries, MPI_INT, received_matrix, local_entries, MPI_INT, 0, MPI_COMM_WORLD);
+    if(rank == 0){
+        bitmap(received_matrix, total_entries, row_size, nprocs, iter);
+    }
     
-    //
-    //
-    //
+    free(local_matrix);
+    // free(update_matrix);
+    free(received_matrix);
     
     MPI_Finalize();
     return 0;

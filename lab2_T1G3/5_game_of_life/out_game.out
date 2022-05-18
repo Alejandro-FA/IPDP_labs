@@ -1,0 +1,9 @@
+Process 2 : first index 1024 value 1 - last index 1535 value 0
+Process 3 : first index 1536 value 0 - last index 2047 value 0
+Process 4 : first index 2048 value 1 - last index 2559 value 0
+Process 5 : first index 2560 value 1 - last index 3071 value 0
+Process 6 : first index 3072 value 1 - last index 3583 value 0
+Process 7 : first index 3584 value 0 - last index 4095 value 0
+Process 0 : first index 0 value 0 - last index 511 value 0
+Process 1 : first index 512 value 1 - last index 1023 value 1
+Received matrix first element: 0, last element: 0
