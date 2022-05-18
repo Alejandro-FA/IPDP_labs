@@ -4,14 +4,17 @@
 #include "mpi.h"
 #include <math.h>
 
+#define ind(i, j, nx) (((i)*(nx)) + (j))
+
 void print_matrix(int size, int * matrix){
     
     for(int i = 0; i < size; i++){
        for(int j = 0; j < size; j++){
-           printf("%d ", matrix[i+j]);
+           printf("%d ", matrix[ind(i,j,size)]);
        }
        printf("\n");
     }
+    printf("\n");
     
     
 }
@@ -19,13 +22,11 @@ void print_matrix(int size, int * matrix){
 int * new_matrix(int size, int rank){
     int * matrix = malloc(pow(size,2) * sizeof(int));
     
-    int nrow = 0;
     for(int i = 0; i < size; i++){
        for(int j = 0; j < size; j++){
-           if( i == j) matrix[(size * nrow) + (i+j)] = rank;
-           else matrix[i+j] = 0;
+           if( i == j) matrix[ind(i,j,size)] = rank;
+           else matrix[ind(i,j,size)] = 0;
        }
-        nrow++;
     }
 
     return matrix;
@@ -41,13 +42,22 @@ int main()
     int world_rank, world_size;
     MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
     MPI_Comm_size(MPI_COMM_WORLD, &world_size);
-
-    int * matrix = new_matrix(world_size, world_rank);
-
-    if(world_rank == 1) print_matrix(world_size, matrix);
     
+    
+    int * matrix = new_matrix(world_size, world_rank);
+    if(world_rank == 0) print_matrix(world_size, matrix);
+
+    MPI_Datatype diagonal;
+    
+    MPI_Type_vector (world_size, 1, world_size + 1, MPI_INT, &diagonal );
+    MPI_Type_commit (&diagonal);
+
+    int * matrix_result = malloc(sizeof(int) * pow(world_size,2));
+    MPI_Gather ( &matrix[0], 4, diagonal, matrix_result, 4, diagonal, 0, MPI_COMM_WORLD);
+
     // Free memory allocated in the heap and close framework
     free(matrix);
+    MPI_Type_free (&diagonal);
 
     MPI_Finalize();
     return 0;
