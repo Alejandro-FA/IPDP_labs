@@ -7,3 +7,5 @@ mean
 mean_calc
 *.zip
 make.out
+matrix_vector.bin
+matrix.bin
