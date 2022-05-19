@@ -43,11 +43,19 @@ double * par_read(char * in_file, int * p_size, int rank, int nprocs ) {
 
 
 
-int main() {
+int main(int argc, char const *argv[]) {
+
+    if(argc != 2){
+        printf("The number of threads is required as an argument. \n");
+        return -1;
+    }
+    int nthreads = argv[1];
+
     MPI_Init(NULL, NULL);
     
     // Get world communicator information
     int world_rank, world_size;
+    double start_time, end_time;
     MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
     MPI_Comm_size(MPI_COMM_WORLD, &world_size);
 
@@ -55,7 +63,11 @@ int main() {
     char file1_name[100] = {"/shared/Labs/Lab_2/array_p.bin\0"};
     char file2_name[100] = {"/shared/Labs/Lab_2/array_q.bin\0"};
     int p_size1, p_size2;
-    // TODO: compute execution time
+    // TODO: compute execution time: Done, check wether the benchmarking region is correct! 19/05/22
+
+    MPI_Barrier(MPI_COMM_WORLD);
+    start_time = MPI_Wtime();
+
     double * buf_array1 = par_read(file1_name, &p_size1, world_rank, world_size);
     double * buf_array2 = par_read(file2_name, &p_size2, world_rank, world_size);
     
@@ -72,7 +84,13 @@ int main() {
     // Combine the results of each process
     double solution = 0.0;
     MPI_Reduce( &sum, &solution, 4, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
-    if (world_rank == 0) printf("The result of the dot product is %lf\n", solution);
+
+    end_time = MPI_Wtime();
+
+    if (world_rank == 0){
+        printf("The result of the dot product is %lf\n", solution);
+        printf("It took %f seconds to read the files, to compute the dot product and to gather the final result.\n Number of processes: %d \n Number of threads: %d\n", end_time - start_time, world_size, nthreads);
+    }
 
     // Free memory allocated in the heap and close framework
     free(buf_array1);
