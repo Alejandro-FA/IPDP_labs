@@ -23,28 +23,29 @@ double* mat_prod(double* matrix, double* vector, int mat_rows, int vec_size, int
 
 double * par_read(char * in_file, int * p_size, int rank, int nprocs ) {
     MPI_File fh;
-    MPI_Offset filesize, bufsize;
+    MPI_Offset filesize, read_offset;
     MPI_Status status;
+    int bufsize;
 
     // Open specified file
     MPI_File_open (MPI_COMM_WORLD, in_file, MPI_MODE_RDONLY, MPI_INFO_NULL, &fh);
 
     // Get information about the opened file
     MPI_File_get_size (fh, &filesize);
-    bufsize = filesize / nprocs;
-    *p_size = bufsize < filesize - rank*bufsize ? bufsize : filesize - rank*bufsize;
-    *p_size /= sizeof(double);
+    read_offset = (filesize/nprocs) * rank;
+    if (rank == nprocs - 1) bufsize = filesize - read_offset; // Takes into account non-divisible number of elements
+    else bufsize = filesize / nprocs;
+    *p_size = bufsize / sizeof(double);
 
     // Allocate buffer to store the doubles read from the file
     double* buf = malloc ( bufsize );
 
     // Read at the specific position depending on the rank of the process
-    MPI_File_seek (fh, rank*bufsize, MPI_SEEK_SET);
-    MPI_File_read (fh, buf, *p_size, MPI_INT, &status);
+    MPI_File_read_at (fh, read_offset , buf, *p_size, MPI_DOUBLE, &status);
 
     // Control print and return
-    printf("Process %d : first index %d value %lf - last index %d value %lf\n",
-        rank, rank*(*p_size), buf[0], (rank+1)*(*p_size)-1, buf[*p_size-1]);
+    printf("Process %d : first index %lld value %lf - last index %lld value %lf\n",
+        rank, read_offset/sizeof(double), buf[0], read_offset/sizeof(double) + (*p_size) -1, buf[*p_size-1]);
     MPI_File_close (&fh);
 
     return buf;

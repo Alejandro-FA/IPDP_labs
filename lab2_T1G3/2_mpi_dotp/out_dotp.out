@@ -1,13 +1,13 @@
 Process 1 : first index 25000000 value -0.293340 - last index 49999999 value 0.177089
-Process 2 : first index 50000000 value -0.048530 - last index 74999999 value -0.363053
 Process 3 : first index 75000000 value -0.272417 - last index 99999999 value 0.184088
+Process 2 : first index 50000000 value -0.048530 - last index 74999999 value -0.363053
 Process 0 : first index 0 value -0.046904 - last index 24999999 value -0.193459
+Process 3 : first index 75000000 value 0.000000 - last index 99999999 value 0.000000
 Process 1 : first index 25000000 value 1.000000 - last index 49999999 value 0.000000
 Process 2 : first index 50000000 value 0.000000 - last index 74999999 value 0.000000
-Process 3 : first index 75000000 value 0.000000 - last index 99999999 value 0.000000
 Process 0 : first index 0 value 0.000000 - last index 24999999 value 0.000000
 Process with rank 2: sum = -455.357499
-Process with rank 3: sum = -132.722647
 Process with rank 1: sum = -165.938381
 Process with rank 0: sum = -1025.337328
+Process with rank 3: sum = -132.722647
 The result of the dot product is -1779.355855

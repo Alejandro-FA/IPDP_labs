@@ -1,4 +1,0 @@
-game_of_life.c: In function ‘par_read’:
-game_of_life.c:18:9: warning: unused variable ‘intsize’ [-Wunused-variable]
-   18 |     int intsize;
-      |         ^~~~~~~
