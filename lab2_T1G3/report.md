@@ -6,8 +6,21 @@ Marc Aguilar and Alejandro Fernández
 
 There's not much to comment here. The code directly addresses all the tasks proposed by the exercise. In order to decide whether a process has an even or an odd rank, we've used the **modulo 2 operation**.
 
-## Exercise 2: Dot product
+## Exercise 2: Dot Product
 
+## Exercise 3: Matrix Vector Product
+
+In this exercise we considered that it would be a good approach to implement the matrix vector product computation in parallel with a fixed number of threads. Therefore we used a similar approach to the last exercise with OpenMP with **4 threads** in all the cases.
+
+| Number of processes | Execution time (s) |
+| ------------------- | ------------------ |
+| 1                   | 1.245931           |
+| 2                   | 1.133708           |
+| 4                   | 21.609             |
+| 8                   | 21.468             |
+| 16                  | 21.468             |
+
+*The execution times are an average of 5 runs.*
 
 ## Exercise 4: Broadcast (Gather)
 

@@ -21,31 +21,33 @@ double* mat_prod(double* matrix, double* vector, int mat_rows, int vec_size, int
     return result;
 }
 
-double * par_read(char * in_file, int * p_size, int rank, int nprocs ) {
+double * par_read(char * in_file, int * p_size, int rank, int nprocs, int loglevel ) {
     MPI_File fh;
     MPI_Offset filesize, read_offset;
     MPI_Status status;
-    int bufsize;
 
     // Open specified file
     MPI_File_open (MPI_COMM_WORLD, in_file, MPI_MODE_RDONLY, MPI_INFO_NULL, &fh);
 
     // Get information about the opened file
     MPI_File_get_size (fh, &filesize);
+    filesize /= sizeof(double);
     read_offset = (filesize/nprocs) * rank;
-    if (rank == nprocs - 1) bufsize = filesize - read_offset; // Takes into account non-divisible number of elements
-    else bufsize = filesize / nprocs;
-    *p_size = bufsize / sizeof(double);
+    if (rank == nprocs - 1) *p_size = filesize - read_offset; // Takes into account non-divisible number of elements
+    else *p_size = filesize / nprocs;
+
 
     // Allocate buffer to store the doubles read from the file
-    double* buf = malloc ( bufsize );
+    double* buf = malloc ( (*p_size) * sizeof(double));
 
     // Read at the specific position depending on the rank of the process
-    MPI_File_read_at (fh, read_offset , buf, *p_size, MPI_DOUBLE, &status);
+    MPI_File_read_at (fh, read_offset * sizeof(double), buf, *p_size, MPI_DOUBLE, &status);
 
     // Control print and return
-    printf("Process %d : first index %lld value %lf - last index %lld value %lf\n",
-        rank, read_offset/sizeof(double), buf[0], read_offset/sizeof(double) + (*p_size) -1, buf[*p_size-1]);
+    if (loglevel == 0) {
+        printf("Process %d : first index %lld value %lf - last index %lld value %lf\n",
+            rank, read_offset, buf[0], read_offset + (*p_size) -1, buf[*p_size-1]);
+    }
     MPI_File_close (&fh);
 
     return buf;
@@ -54,12 +56,20 @@ double * par_read(char * in_file, int * p_size, int rank, int nprocs ) {
 
 int main(int argc, char const *argv[]){
 
-    if(argc != 2){
-        printf("The number of threads is required as an argument. \n");
-        return -1;
+    /********************** Get the number of threads to use *********************/
+    if (argc != 3) { printf("The number of threads and the log level (0 for debug or 1 for results only) have to be passed as arguments (e.g. './mpi_dotp 4 0')\n"); return -1; }
+    int nthreads = atoi(argv[1]);
+    int loglevel = atoi(argv[2]);
+    if (nthreads < 1 || nthreads > 24) {
+        printf("The argument defines the number of threads and it must be between 1 and 24.\nUsing default value of 1...\n");
+        nthreads = 1;
+    }
+    if (loglevel != 0 && loglevel != 1) {
+        printf("The log level determines the amount of information to print, and it has to be either 0 (debug) or 1 (just results).\nUsing default value of 0...\n");
+        loglevel = 0;
     }
 
-    int num_threads = argv[1];
+
 
     MPI_Init(NULL, NULL);
     
@@ -77,8 +87,8 @@ int main(int argc, char const *argv[]){
     MPI_Barrier(MPI_COMM_WORLD);
     start_time = MPI_Wtime();
 
-    double * matrix_section = par_read(file1_name, &mat_elems, world_rank, world_size);
-    double * vector_section = par_read(file2_name, &vec_elems, world_rank, world_size);
+    double * matrix_section = par_read(file1_name, &mat_elems, world_rank, world_size, loglevel);
+    double * vector_section = par_read(file2_name, &vec_elems, world_rank, world_size, loglevel);
     fflush(stdout);
     sleep(1);
     MPI_Barrier(MPI_COMM_WORLD);
@@ -93,7 +103,7 @@ int main(int argc, char const *argv[]){
     }
 
     // Compute the matrix - vector product
-    double * res_section = mat_prod(matrix_section, vector_complete, mat_elems / (vec_elems * world_size), vec_elems * world_size, num_threads);
+    double * res_section = mat_prod(matrix_section, vector_complete, mat_elems / (vec_elems * world_size), vec_elems * world_size, nthreads);
     double * res_complete = malloc(vec_elems * world_size * sizeof(double));
     MPI_Allgather (res_section, vec_elems, MPI_DOUBLE, res_complete, vec_elems, MPI_DOUBLE, MPI_COMM_WORLD);
 
@@ -101,11 +111,13 @@ int main(int argc, char const *argv[]){
     end_time = MPI_Wtime();
 
     if(world_rank == 0) {
-        for (int i = 0; i < vec_elems * world_size; ++i) {
-            printf("%lf\n", res_complete[i]);
+        if (loglevel == 0) {
+            for (int i = 0; i < vec_elems * world_size; ++i) printf("%lf\n", res_complete[i]);
         }
+        else printf("First element of matrix * vector product: %lf\n", res_complete[0]);
         fflush(stdout);
-        printf("It took %f seconds to read the files, to distribute vector `b`, to compute the multiplication and to gather the final result.\n Number of processes: %d \n Number of threads: %d\n", end_time - start_time, world_size, num_threads);
+        
+        printf("It took %f seconds to read the files, to distribute vector `b`, to compute the multiplication and to gather the final result.\n Number of processes: %d \n Number of threads: %d\n", end_time - start_time, world_size, nthreads);
     }
     
     // Free memory allocated in the heap and close framework

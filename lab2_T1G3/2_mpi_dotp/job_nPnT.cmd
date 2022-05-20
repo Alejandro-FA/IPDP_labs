@@ -1,9 +1,9 @@
 #!/bin/bash
 #SBATCH --job-name=test
-#SBATCH --output=out_dotp_12P2T.out
+#SBATCH --output=out_dotp_6P4T.out
 #SBATCH --error=out_dotp.err
-#SBATCH --ntasks=12
-#SBATCH --cpus-per-task=2
+#SBATCH --ntasks=6
+#SBATCH --cpus-per-task=4
 #SBATCH --time=00:05:00
 
 source /etc/profile.d/z00-global-profile.sh
@@ -31,16 +31,16 @@ nruns=5
 # done
 # echo "--------------------"
 
-# echo "Processes: 6, Threads: 4"
-# for (( i = 0; i < $nruns; i++ ))
-# do
-#     mpirun -np 6 --bind-to none -x OMP_NUM_THREADS=4 ./a.out 4 1
-# done
-# echo "--------------------"
-
-echo "Processes: 12, Threads: 2"
+echo "Processes: 6, Threads: 4"
 for (( i = 0; i < $nruns; i++ ))
 do
-    mpirun -np 12 --bind-to none -x OMP_NUM_THREADS=4 ./a.out 2 1
+    mpirun -np 6 --bind-to none -x OMP_NUM_THREADS=4 ./a.out 4 1
 done
 echo "--------------------"
+
+# echo "Processes: 12, Threads: 2"
+# for (( i = 0; i < $nruns; i++ ))
+# do
+#     mpirun -np 12 --bind-to none -x OMP_NUM_THREADS=4 ./a.out 2 1
+# done
+# echo "--------------------"

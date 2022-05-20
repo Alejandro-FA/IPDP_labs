@@ -15,28 +15,28 @@ double * par_read(char * in_file, int * p_size, int rank, int nprocs, int loglev
     MPI_File fh;
     MPI_Offset filesize, read_offset;
     MPI_Status status;
-    int bufsize;
 
     // Open specified file
     MPI_File_open (MPI_COMM_WORLD, in_file, MPI_MODE_RDONLY, MPI_INFO_NULL, &fh);
 
     // Get information about the opened file
     MPI_File_get_size (fh, &filesize);
+    filesize /= sizeof(double);
     read_offset = (filesize/nprocs) * rank;
-    if (rank == nprocs - 1) bufsize = filesize - read_offset; // Takes into account non-divisible number of elements
-    else bufsize = filesize / nprocs;
-    *p_size = bufsize / sizeof(double);
+    if (rank == nprocs - 1) *p_size = filesize - read_offset; // Takes into account non-divisible number of elements
+    else *p_size = filesize / nprocs;
+
 
     // Allocate buffer to store the doubles read from the file
-    double* buf = malloc ( bufsize );
+    double* buf = malloc ( (*p_size) * sizeof(double));
 
     // Read at the specific position depending on the rank of the process
-    MPI_File_read_at (fh, read_offset , buf, *p_size, MPI_DOUBLE, &status);
+    MPI_File_read_at (fh, read_offset * sizeof(double), buf, *p_size, MPI_DOUBLE, &status);
 
     // Control print and return
     if (loglevel == 0) {
         printf("Process %d : first index %lld value %lf - last index %lld value %lf\n",
-            rank, read_offset/sizeof(double), buf[0], read_offset/sizeof(double) + (*p_size) -1, buf[*p_size-1]);
+            rank, read_offset, buf[0], read_offset + (*p_size) -1, buf[*p_size-1]);
     }
     MPI_File_close (&fh);
 
@@ -64,7 +64,6 @@ int main(int argc, char *argv[]) {
     /******************************* Read the files ******************************/
     // Get world communicator information
     int world_rank, world_size;
-    double start_time, end_time;
     MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
     MPI_Comm_size(MPI_COMM_WORLD, &world_size);
 
