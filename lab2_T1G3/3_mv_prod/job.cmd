@@ -14,5 +14,5 @@ module load OpenMPI/4.1.0-GCC-10.2.0
 
 make clean >> make.out && make >> make.out || exit 1 
 
-# mpirun -np 1 ./a.out
-mpirun -np 4 ./a.out
+mpirun -np 1 ./a.out 1
+mpirun -np 4 ./a.out 1

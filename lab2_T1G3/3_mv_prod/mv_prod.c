@@ -52,7 +52,15 @@ double * par_read(char * in_file, int * p_size, int rank, int nprocs ) {
 }
 
 
-int main() {
+int main(int argc, char const *argv[]){
+
+    if(argc != 2){
+        printf("The number of threads is required as an argument. \n");
+        return -1;
+    }
+
+    int num_threads = argv[1];
+
     MPI_Init(NULL, NULL);
     
     // Get world communicator information
@@ -64,6 +72,11 @@ int main() {
     char file1_name[100] = {"/shared/Labs/Lab_2/matrix.bin\0"};
     char file2_name[100] = {"/shared/Labs/Lab_2/matrix_vector.bin\0"};
     int mat_elems, vec_elems;
+    double start_time, end_time;
+
+    MPI_Barrier(MPI_COMM_WORLD);
+    start_time = MPI_Wtime();
+
     double * matrix_section = par_read(file1_name, &mat_elems, world_rank, world_size);
     double * vector_section = par_read(file2_name, &vec_elems, world_rank, world_size);
     fflush(stdout);
@@ -80,15 +93,19 @@ int main() {
     }
 
     // Compute the matrix - vector product
-    int num_threads = 1;
     double * res_section = mat_prod(matrix_section, vector_complete, mat_elems / (vec_elems * world_size), vec_elems * world_size, num_threads);
     double * res_complete = malloc(vec_elems * world_size * sizeof(double));
     MPI_Allgather (res_section, vec_elems, MPI_DOUBLE, res_complete, vec_elems, MPI_DOUBLE, MPI_COMM_WORLD);
+
+    // No barrier needed since gather already has it 
+    end_time = MPI_Wtime();
+
     if(world_rank == 0) {
         for (int i = 0; i < vec_elems * world_size; ++i) {
             printf("%lf\n", res_complete[i]);
         }
         fflush(stdout);
+        printf("It took %f seconds to read the files, to distribute vector `b`, to compute the multiplication and to gather the final result.\n Number of processes: %d \n Number of threads: %d\n", end_time - start_time, world_size, num_threads);
     }
     
     // Free memory allocated in the heap and close framework

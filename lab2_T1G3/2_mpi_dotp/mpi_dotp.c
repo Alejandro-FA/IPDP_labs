@@ -64,6 +64,7 @@ int main(int argc, char *argv[]) {
     /******************************* Read the files ******************************/
     // Get world communicator information
     int world_rank, world_size;
+    double start_time, end_time;
     MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
     MPI_Comm_size(MPI_COMM_WORLD, &world_size);
 
