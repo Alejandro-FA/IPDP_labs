@@ -1,0 +1,12 @@
+Processes: 6, Threads: 4
+The result of the dot product is nan
+Computation time: 0.019795 s
+The result of the dot product is nan
+Computation time: 0.023737 s
+The result of the dot product is -nan
+Computation time: 0.030203 s
+The result of the dot product is nan
+Computation time: 0.023356 s
+The result of the dot product is -nan
+Computation time: 0.016543 s
+--------------------

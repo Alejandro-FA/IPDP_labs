@@ -1,0 +1,60 @@
+Processes: 1
+The result of the dot product is -1779.355855
+Computation time: 0.065347 s
+The result of the dot product is -1779.355855
+Computation time: 0.063905 s
+The result of the dot product is -1779.355855
+Computation time: 0.064188 s
+The result of the dot product is -1779.355855
+Computation time: 0.064142 s
+The result of the dot product is -1779.355855
+Computation time: 0.064215 s
+--------------------
+Processes: 2
+The result of the dot product is -1779.355855
+Computation time: 0.033444 s
+The result of the dot product is -1779.355855
+Computation time: 0.043909 s
+The result of the dot product is -1779.355855
+Computation time: 0.037164 s
+The result of the dot product is -1779.355855
+Computation time: 0.036869 s
+The result of the dot product is -1779.355855
+Computation time: 0.037129 s
+--------------------
+Processes: 4
+The result of the dot product is -1779.355855
+Computation time: 0.022960 s
+The result of the dot product is -1779.355855
+Computation time: 0.022946 s
+The result of the dot product is -1779.355855
+Computation time: 0.023105 s
+The result of the dot product is -1779.355855
+Computation time: 0.024187 s
+The result of the dot product is -1779.355855
+Computation time: 0.023301 s
+--------------------
+Processes: 8
+The result of the dot product is -1779.355855
+Computation time: 0.026872 s
+The result of the dot product is -1779.355855
+Computation time: 0.021879 s
+The result of the dot product is -1779.355855
+Computation time: 0.022005 s
+The result of the dot product is -1779.355855
+Computation time: 0.026789 s
+The result of the dot product is -1779.355855
+Computation time: 0.022140 s
+--------------------
+Processes: 16
+The result of the dot product is -1779.355855
+Computation time: 0.022049 s
+The result of the dot product is -1779.355855
+Computation time: 0.023933 s
+The result of the dot product is -1779.355855
+Computation time: 0.021963 s
+The result of the dot product is -1779.355855
+Computation time: 0.021931 s
+The result of the dot product is -1779.355855
+Computation time: 0.021972 s
+--------------------

@@ -1,0 +1,60 @@
+Threads: 1
+The result of the dot product is -1779.355855
+Computation time: 0.071044 s
+The result of the dot product is -1779.355855
+Computation time: 0.064511 s
+The result of the dot product is -1779.355855
+Computation time: 0.065578 s
+The result of the dot product is -1779.355855
+Computation time: 0.065667 s
+The result of the dot product is -1779.355855
+Computation time: 0.065534 s
+--------------------
+Threads: 2
+The result of the dot product is -1779.355855
+Computation time: 0.038193 s
+The result of the dot product is -1779.355855
+Computation time: 0.044400 s
+The result of the dot product is -1779.355855
+Computation time: 0.044177 s
+The result of the dot product is -1779.355855
+Computation time: 0.044526 s
+The result of the dot product is -1779.355855
+Computation time: 0.044388 s
+--------------------
+Threads: 4
+The result of the dot product is -1779.355855
+Computation time: 0.025037 s
+The result of the dot product is -1779.355855
+Computation time: 0.024379 s
+The result of the dot product is -1779.355855
+Computation time: 0.024466 s
+The result of the dot product is -1779.355855
+Computation time: 0.024889 s
+The result of the dot product is -1779.355855
+Computation time: 0.024451 s
+--------------------
+Threads: 8
+The result of the dot product is -1779.355855
+Computation time: 0.023200 s
+The result of the dot product is -1779.355855
+Computation time: 0.023352 s
+The result of the dot product is -1779.355855
+Computation time: 0.022932 s
+The result of the dot product is -1779.355855
+Computation time: 0.022928 s
+The result of the dot product is -1779.355855
+Computation time: 0.022938 s
+--------------------
+Threads: 16
+The result of the dot product is -1779.355855
+Computation time: 0.022783 s
+The result of the dot product is -1779.355855
+Computation time: 0.054481 s
+The result of the dot product is -1779.355855
+Computation time: 0.033914 s
+The result of the dot product is -1779.355855
+Computation time: 0.022584 s
+The result of the dot product is -1779.355855
+Computation time: 0.022689 s
+--------------------
