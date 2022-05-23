@@ -10,7 +10,7 @@
 double* mat_prod(double* matrix, double* vector, int mat_rows, int vec_size, int num_threads) {
     double * result = malloc(sizeof(double) * mat_rows);
     
-    #pragma omp parallel for simd num_threads(num_threads)
+    // #pragma omp parallel for simd num_threads(num_threads)
     for (int i = 0; i < mat_rows; i++) {
         double sum = 0.0;
         for(int j = 0; j < vec_size; j++) sum += matrix[ind(i,j,vec_size)] * vector[j];
@@ -82,10 +82,6 @@ int main(int argc, char const *argv[]){
     char file1_name[100] = {"/shared/Labs/Lab_2/matrix.bin\0"};
     char file2_name[100] = {"/shared/Labs/Lab_2/matrix_vector.bin\0"};
     int mat_elems, vec_elems;
-    double start_time, end_time;
-
-    MPI_Barrier(MPI_COMM_WORLD);
-    start_time = MPI_Wtime();
 
     double * matrix_section = par_read(file1_name, &mat_elems, world_rank, world_size, loglevel);
     double * vector_section = par_read(file2_name, &vec_elems, world_rank, world_size, loglevel);
@@ -96,28 +92,28 @@ int main(int argc, char const *argv[]){
     // Distribute b to all processes
     double * vector_complete = malloc(vec_elems * world_size * sizeof(double));
     MPI_Allgather (vector_section, vec_elems, MPI_DOUBLE, vector_complete, vec_elems, MPI_DOUBLE, MPI_COMM_WORLD);
-    if(world_rank == 0){
+    if(world_rank == 0 && loglevel == 0){
         printf("Complete vector elements: %d. Complete matrix rows: %d, columns: %d\n",
             vec_elems * world_size, mat_elems / vec_elems, vec_elems * world_size);
         fflush(stdout);
     }
 
     // Compute the matrix - vector product
-    double * res_section = mat_prod(matrix_section, vector_complete, mat_elems / (vec_elems * world_size), vec_elems * world_size, nthreads);
+    double start_time, end_time;
     double * res_complete = malloc(vec_elems * world_size * sizeof(double));
+    start_time = MPI_Wtime();
+    double * res_section = mat_prod(matrix_section, vector_complete, mat_elems / (vec_elems * world_size), vec_elems * world_size, nthreads);
     MPI_Allgather (res_section, vec_elems, MPI_DOUBLE, res_complete, vec_elems, MPI_DOUBLE, MPI_COMM_WORLD);
-
-    // No barrier needed since gather already has it 
     end_time = MPI_Wtime();
 
+    // No barrier needed since gather already has it 
     if(world_rank == 0) {
         if (loglevel == 0) {
             for (int i = 0; i < vec_elems * world_size; ++i) printf("%lf\n", res_complete[i]);
         }
         else printf("First element of matrix * vector product: %lf\n", res_complete[0]);
+        printf("Execution time: %lf s\n", end_time - start_time);
         fflush(stdout);
-        
-        printf("It took %f seconds to read the files, to distribute vector `b`, to compute the multiplication and to gather the final result.\n Number of processes: %d \n Number of threads: %d\n", end_time - start_time, world_size, nthreads);
     }
     
     // Free memory allocated in the heap and close framework

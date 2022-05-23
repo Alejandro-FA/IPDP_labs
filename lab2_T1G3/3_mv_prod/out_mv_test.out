@@ -1,60 +1,60 @@
 Processes: 1
 First element of matrix * vector product: -3.271111
-Execution time: 0.063202 s
+Execution time: 0.063437 s
 First element of matrix * vector product: -3.271111
-Execution time: 0.066599 s
+Execution time: 0.062974 s
 First element of matrix * vector product: -3.271111
-Execution time: 0.063433 s
+Execution time: 0.063035 s
 First element of matrix * vector product: -3.271111
-Execution time: 0.064290 s
+Execution time: 0.063497 s
 First element of matrix * vector product: -3.271111
-Execution time: 0.066106 s
+Execution time: 0.063057 s
 --------------------
 Processes: 2
 First element of matrix * vector product: -3.271111
-Execution time: 0.032121 s
+Execution time: 0.032569 s
 First element of matrix * vector product: -3.271111
-Execution time: 0.031918 s
+Execution time: 0.032478 s
 First element of matrix * vector product: -3.271111
-Execution time: 0.031940 s
+Execution time: 0.032109 s
 First element of matrix * vector product: -3.271111
-Execution time: 0.031696 s
+Execution time: 0.031919 s
 First element of matrix * vector product: -3.271111
-Execution time: 0.031985 s
+Execution time: 0.031928 s
 --------------------
 Processes: 4
 First element of matrix * vector product: -3.271111
-Execution time: 0.016477 s
+Execution time: 0.023430 s
 First element of matrix * vector product: -3.271111
-Execution time: 0.016307 s
+Execution time: 0.030829 s
 First element of matrix * vector product: -3.271111
-Execution time: 0.016610 s
+Execution time: 0.030725 s
 First element of matrix * vector product: -3.271111
-Execution time: 0.016089 s
+Execution time: 0.020842 s
 First element of matrix * vector product: -3.271111
-Execution time: 0.015972 s
+Execution time: 0.021804 s
 --------------------
 Processes: 8
 First element of matrix * vector product: -3.271111
-Execution time: 0.009148 s
+Execution time: 0.045412 s
 First element of matrix * vector product: -3.271111
-Execution time: 0.009451 s
+Execution time: 0.060485 s
 First element of matrix * vector product: -3.271111
-Execution time: 0.009163 s
+Execution time: 0.040701 s
 First element of matrix * vector product: -3.271111
-Execution time: 0.010764 s
+Execution time: 0.049153 s
 First element of matrix * vector product: -3.271111
-Execution time: 0.009167 s
+Execution time: 0.053676 s
 --------------------
 Processes: 16
 First element of matrix * vector product: -3.271111
-Execution time: 0.007321 s
+Execution time: 0.088550 s
 First element of matrix * vector product: -3.271111
-Execution time: 0.007345 s
+Execution time: 0.086670 s
 First element of matrix * vector product: -3.271111
-Execution time: 0.007357 s
+Execution time: 0.099642 s
 First element of matrix * vector product: -3.271111
-Execution time: 0.007304 s
+Execution time: 0.093976 s
 First element of matrix * vector product: -3.271111
-Execution time: 0.007333 s
+Execution time: 0.092855 s
 --------------------

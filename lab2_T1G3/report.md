@@ -8,6 +8,35 @@ There's not much to comment here. The code directly addresses all the tasks prop
 
 ## Exercise 2: Dot Product
 
+| Number of threads   | Execution time (s) |
+| ------------------- | ------------------ |
+| 1                   | 1.245931           |
+| 2                   | 1.133708           |
+| 4                   | 21.609             |
+| 8                   | 21.468             |
+| 16                  | 21.468             |
+
+*The execution times are an average of 5 runs.*
+
+| Number of processes | Execution time (s) |
+| ------------------- | ------------------ |
+| 1                   | 1.245931           |
+| 2                   | 1.133708           |
+| 4                   | 21.609             |
+| 8                   | 21.468             |
+| 16                  | 21.468             |
+
+*The execution times are an average of 5 runs.*
+
+| processes / threads | Execution time (s) |
+| ------------------- | ------------------ |
+| 2P / 2T             | 0.0203             |
+| 4P / 6T             | 0.0188             |
+| 6P / 4T             | 0.0189             |
+| 12P / 2T            | 0.0239             |
+
+*The execution times are an average of 5 runs.*
+
 ## Exercise 3: Matrix Vector Product
 
 In this exercise we considered that it would be a good approach to implement the matrix vector product computation in parallel with a fixed number of threads. Therefore we used a similar approach to the last exercise with OpenMP with **4 threads** in all the cases.
