@@ -1,0 +1,89 @@
+
+WARNING: Your license to use PGI Community Edition version 19.4 has expired.
+Please obtain a new version at http://www.pgroup.com/community or
+contact PGI Sales at sales@pgroup.com to obtain a perpetual license.
+
+readimg:
+     21, Loop not vectorized/parallelized: contains call
+saveimg:
+     34, Loop not vectorized/parallelized: contains call
+clear_border:
+     47, Memory zero idiom, loop replaced by call to __c_mzero4
+     49, Memory zero idiom, loop replaced by call to __c_mzero4
+     53, Loop not fused: dependence chain to sibling loop
+         Loop unrolled 4 times
+     55, Loop unrolled 4 times
+invert:
+     69, Loop not vectorized: data dependency
+         Loop unrolled 2 times
+     72, limit_pixel inlined, size=4 (inline) file imgproc.c (58)
+smooth:
+     81, Loop not fused: function call before adjacent loop
+     82, Loop not vectorized: data dependency
+     94, limit_pixel inlined, size=4 (inline) file imgproc.c (58)
+     97, clear_border inlined, size=18 (inline) file imgproc.c (44)
+          47, Memory zero idiom, loop replaced by call to __c_mzero4
+          49, Memory zero idiom, loop replaced by call to __c_mzero4
+          53, Loop not fused: dependence chain to sibling loop
+              Loop unrolled 4 times
+          55, Loop unrolled 4 times
+detect:
+    104, Loop not fused: function call before adjacent loop
+    105, Loop not vectorized: data dependency
+    113, limit_pixel inlined, size=4 (inline) file imgproc.c (58)
+    116, clear_border inlined, size=18 (inline) file imgproc.c (44)
+          47, Memory zero idiom, loop replaced by call to __c_mzero4
+          49, Memory zero idiom, loop replaced by call to __c_mzero4
+          53, Loop not fused: dependence chain to sibling loop
+              Loop unrolled 4 times
+          55, Loop unrolled 4 times
+enhance:
+    123, Loop not fused: function call before adjacent loop
+    124, Loop not vectorized: data dependency
+    131, limit_pixel inlined, size=4 (inline) file imgproc.c (58)
+    134, clear_border inlined, size=18 (inline) file imgproc.c (44)
+          47, Memory zero idiom, loop replaced by call to __c_mzero4
+          49, Memory zero idiom, loop replaced by call to __c_mzero4
+          53, Loop not fused: dependence chain to sibling loop
+              Loop unrolled 4 times
+          55, Loop unrolled 4 times
+main:
+    164, readimg inlined, size=11 (inline) file imgproc.c (15)
+          21, Loop not vectorized/parallelized: contains call
+    169, invert inlined, size=17 (inline) file imgproc.c (65)
+          68, Loop not fused: different loop trip count
+          69, Loop not vectorized: data dependency
+              Loop unrolled 2 times
+          72, limit_pixel inlined, size=4 (inline) file imgproc.c (58)
+    170, smooth inlined, size=61 (inline) file imgproc.c (78)
+          81, Loop not fused: function call before adjacent loop
+          82, Loop not vectorized: data dependency
+          94, limit_pixel inlined, size=4 (inline) file imgproc.c (58)
+          97, Memory zero idiom, loop replaced by call to __c_mzero4
+              Loop not fused: dependence chain to sibling loop
+              Loop not fused: different loop trip count
+              Loop unrolled 4 times
+    171, detect inlined, size=52 (inline) file imgproc.c (101)
+         104, Loop not fused: function call before adjacent loop
+         105, Loop not vectorized: data dependency
+         113, limit_pixel inlined, size=4 (inline) file imgproc.c (58)
+         116, Memory zero idiom, loop replaced by call to __c_mzero4
+              Loop not fused: dependence chain to sibling loop
+              Loop not fused: different loop trip count
+              Loop unrolled 4 times
+    172, enhance inlined, size=52 (inline) file imgproc.c (120)
+         123, Loop not fused: function call before adjacent loop
+         124, Loop not vectorized: data dependency
+         131, limit_pixel inlined, size=4 (inline) file imgproc.c (58)
+         134, Memory zero idiom, loop replaced by call to __c_mzero4
+              Loop not fused: dependence chain to sibling loop
+              Loop not fused: function call before adjacent loop
+              Loop unrolled 4 times
+    183, saveimg inlined, size=12 (inline) file imgproc.c (29)
+          34, Loop not vectorized/parallelized: contains call
+    185, saveimg inlined, size=12 (inline) file imgproc.c (29)
+          34, Loop not vectorized/parallelized: contains call
+    187, saveimg inlined, size=12 (inline) file imgproc.c (29)
+          34, Loop not vectorized/parallelized: contains call
+    189, saveimg inlined, size=12 (inline) file imgproc.c (29)
+          34, Loop not vectorized/parallelized: contains call

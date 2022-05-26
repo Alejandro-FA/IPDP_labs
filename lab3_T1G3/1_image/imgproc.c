@@ -40,28 +40,98 @@ void saveimg(char *filename,int nx,int ny,int *image){
 
 }
 
+//////////* OUR OWN FUNCTIONS *////////////
+void clear_border(int* image, int nx, int ny){
+   // Clearing both horizontal axis
+   #pragma acc parallel loop
+   for(int i = 0;  i < nx; i++) image[pixel(i,0,nx)] = 0; 
+   #pragma acc parallel loop
+   for(int i = 0;  i < nx; i++) image[pixel(i,ny-1,nx)] = 0; 
+   
+   // Clearing both vertical axis
+   #pragma acc parallel loop
+   for(int j = 1;  j < ny-1; j++) image[pixel(0,j,nx)] = 0;
+   #pragma acc parallel loop
+   for(int j = 1;  j < ny-1; j++) image[pixel(nx-1,j,nx)] = 0;
+}
+
+int limit_pixel(int value) {
+   if (value > 255) return 255;
+   else if(value < 0) return 0;
+   else return value;
+}
+
 /*invert*/
 void invert(int* image, int* image_invert, int nx, int ny){
-
-   /*... your work....*/
+   
+   #pragma acc parallel loop
+   for (int i = 0; i < nx ; i++) {
+      for (int j = 0; j < ny ; j++) {
+         int p = pixel(i,j,nx);
+         image_invert[p] = 255 - image[p];
+         image_invert[p] = limit_pixel(image_invert[p]);
+      }
+   }
 }
 
 /*smooth*/
 void smooth(int* image, int* image_smooth, int nx, int ny){
-
-   /*... your work....*/
+   
+   #pragma acc parallel loop
+   for (int i = 1; i < nx-1 ; i++) {
+      for (int j = 1; j < ny-1 ; j++) {
+         image_smooth[pixel(i,j,nx)] = (
+            image[pixel(i-1,j+1,nx)] + 
+            image[pixel(i,j+1,nx)] +
+            image[pixel(i+1,j+1,nx)] +
+            image[pixel(i-1,j,nx)] +
+            image[pixel(i,j,nx)] +
+            image[pixel(i+1,j,nx)]+
+            image[pixel(i-1,j-1,nx)] +
+            image[pixel(i,j-1,nx)] +
+            image[pixel(i+1,j-1,nx)] ) / 9;
+         
+         image_smooth[pixel(i,j,nx)] = limit_pixel(image_smooth[pixel(i,j,nx)]);
+      }
+   }
+   clear_border(image_smooth, nx, ny);
 }
 
 /*detect*/
 void detect(int* image, int* image_detect, int nx, int ny){
-   
-   /*... your work....*/
+  
+   #pragma acc parallel loop
+   for(int i = 1; i < nx-1 ; i++) {
+      for(int j = 1; j < ny-1 ; j++) {
+         image_detect[pixel(i,j,nx)] =
+            image[pixel(i-1,j,nx)] +
+            image[pixel(i+1,j,nx)] +
+            image[pixel(i,j-1,nx)] +
+            image[pixel(i,j+1,nx)] -
+            4 * image[pixel(i,j,nx)];
+
+         image_detect[pixel(i,j,nx)] = limit_pixel(image_detect[pixel(i,j,nx)]);
+      }
+   }
+   clear_border(image_detect, nx, ny);
 }
 
 /*enhance*/
 void enhance(int* image,int *image_enhance,int nx, int ny){
-   
-   /*... your work....*/
+  
+   #pragma acc parallel loop
+   for (int i = 1; i < nx-1 ; i++) {
+      for (int j = 1; j < ny-1 ; j++) {
+         image_enhance[pixel(i,j,nx)] = 5 * image[pixel(i,j,nx)] - (
+            image[pixel(i-1,j,nx)] +
+            image[pixel(i+1,j,nx)] +
+            image[pixel(i,j-1,nx)] +
+            image[pixel(i,j+1,nx)] );
+
+         image_enhance[pixel(i,j,nx)] = limit_pixel(image_enhance[pixel(i,j,nx)]);
+      }
+   }
+   clear_border(image_enhance, nx, ny);
 }
 
 /* Main program */
@@ -83,7 +153,7 @@ int main (int argc, char *argv[])
    printf("%s %d %d\n", filename, nx, ny);
 
    /* Allocate pointers */
-   int*   image=(int *) malloc(sizeof(int)*nx*ny); 
+   int*   image = (int *) malloc(sizeof(int)*nx*ny); 
    int*   image_invert  = (int *) malloc(sizeof(int)*nx*ny);  
    int*   image_smooth  = (int *) malloc(sizeof(int)*nx*ny);  
    int*   image_detect  = (int *) malloc(sizeof(int)*nx*ny);  
@@ -94,8 +164,16 @@ int main (int argc, char *argv[])
    readimg(filename,nx,ny,image);
 
    /* Apply filters */
-   
-   /*... your work....*/
+   double t1 = 0.0;
+   // #pragma acc data copyin(image[0:nx*ny]) copyout(image_invert[0:nx*ny], image_invert[0:nx*ny], image_smooth[0:nx*ny], image_detect[0:nx*ny], image_enhance[0:nx*ny]) {
+      invert(image, image_invert, nx, ny);
+      smooth(image, image_smooth, nx, ny);
+      detect(image, image_detect, nx, ny);
+      enhance(image, image_enhance, nx, ny);
+   // }
+   double t2 = 0.0;
+   double runtime = t2 - t1;
+
 
    printf("Total time: %f\n",runtime);
 

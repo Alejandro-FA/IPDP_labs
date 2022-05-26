@@ -1,0 +1,3 @@
+pgcc -fast -Minfo=all   -o imgproc imgproc.c
+lleo.txt 1920 1214
+Total time: 0.000000
