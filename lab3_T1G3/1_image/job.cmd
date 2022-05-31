@@ -8,9 +8,8 @@
 #SBATCH --gres=gpu:1             	# Number of gpus
 #SBATCH --time=00:10:00
 
-module load PGI
-module load CUDA
+module load NVHPC/21.2
 
-make || exit 1
+make gpu || exit 1
 ./imgproc lleo 1920 1214
 
