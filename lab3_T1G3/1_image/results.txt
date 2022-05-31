@@ -1,0 +1,9 @@
+pgcc -fast -Minfo=all   -ta=multicore -o imgproc imgproc.c
+lleo.txt 1920 1214
+Total time: 0.287923
+
+----
+
+pgcc -fast -Minfo=all   -ta=tesla -o imgproc imgproc.c
+lleo.txt 1920 1214
+Total time: 2.058571

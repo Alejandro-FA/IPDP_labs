@@ -1,0 +1,48 @@
+clear_border:
+     44, Generating copyout(image[:ny*nx]) [if not already present]
+         Generating Tesla code
+         47, #pragma acc loop gang, vector(128) /* blockIdx.x threadIdx.x */
+     47, Generating copyout(image[:ny*nx]) [if not already present]
+         Generating Tesla code
+         49, #pragma acc loop gang, vector(128) /* blockIdx.x threadIdx.x */
+     49, Generating copyout(image[:ny*nx]) [if not already present]
+         Generating Tesla code
+         53, #pragma acc loop gang, vector(128) /* blockIdx.x threadIdx.x */
+     53, Generating copyout(image[:ny*nx]) [if not already present]
+         Generating Tesla code
+         55, #pragma acc loop gang, vector(128) /* blockIdx.x threadIdx.x */
+limit_pixel:
+     58, Generating implicit acc routine seq
+         Generating acc routine seq
+         Generating Tesla code
+invert:
+     65, Generating copyin(image[:ny*nx]) [if not already present]
+         Generating copyout(image_invert[:ny*nx]) [if not already present]
+         Generating Tesla code
+         68, #pragma acc loop gang, vector(128) collapse(2) /* blockIdx.x threadIdx.x */
+         69,   /* blockIdx.x threadIdx.x collapsed */
+smooth:
+     78, Generating copyin(image[:ny*nx]) [if not already present]
+         Generating copyout(image_smooth[:ny*nx]) [if not already present]
+         Generating Tesla code
+         81, #pragma acc loop gang, vector(128) collapse(2) /* blockIdx.x threadIdx.x */
+         82,   /* blockIdx.x threadIdx.x collapsed */
+detect:
+    102, Generating copyin(image[:ny*nx]) [if not already present]
+         Generating copyout(image_detect[:ny*nx]) [if not already present]
+         Generating Tesla code
+        105, #pragma acc loop gang, vector(128) collapse(2) /* blockIdx.x threadIdx.x */
+        106,   /* blockIdx.x threadIdx.x collapsed */
+enhance:
+    121, Generating copyin(image[:ny*nx]) [if not already present]
+         Generating copyout(image_enhance[:ny*nx]) [if not already present]
+         Generating Tesla code
+        124, #pragma acc loop gang, vector(128) collapse(2) /* blockIdx.x threadIdx.x */
+        125,   /* blockIdx.x threadIdx.x collapsed */
+main:
+    171, Generating enter data create(image_detect[:nx*ny])
+         Generating enter data copyin(image[:nx*ny])
+         Generating enter data create(image_invert[:nx*ny],image_enhance[:nx*ny],image_smooth[:nx*ny])
+    180, Generating exit data copyout(image_detect[:nx*ny])
+         Generating exit data delete(image[:nx*ny])
+         Generating exit data copyout(image_smooth[:nx*ny],image_invert[:nx*ny],image_enhance[:nx*ny])

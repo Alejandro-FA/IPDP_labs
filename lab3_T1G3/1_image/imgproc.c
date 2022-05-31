@@ -43,15 +43,15 @@ void saveimg(char *filename,int nx,int ny,int *image){
 //////////* OUR OWN FUNCTIONS *////////////
 void clear_border(int* image, int nx, int ny){
    // Clearing both horizontal axis
-   #pragma acc parallel loop
+   #pragma acc parallel loop copyout(image[0:nx*ny])
    for(int i = 0;  i < nx; i++) image[pixel(i,0,nx)] = 0; 
-   #pragma acc parallel loop
+   #pragma acc parallel loop copyout(image[0:nx*ny])
    for(int i = 0;  i < nx; i++) image[pixel(i,ny-1,nx)] = 0; 
    
    // Clearing both vertical axis
-   #pragma acc parallel loop
+   #pragma acc parallel loop copyout(image[0:nx*ny])
    for(int j = 1;  j < ny-1; j++) image[pixel(0,j,nx)] = 0;
-   #pragma acc parallel loop
+   #pragma acc parallel loop copyout(image[0:nx*ny])
    for(int j = 1;  j < ny-1; j++) image[pixel(nx-1,j,nx)] = 0;
 }
 
@@ -64,9 +64,9 @@ int limit_pixel(int value) {
 /*invert*/
 void invert(int* image, int* image_invert, int nx, int ny){
    
-   #pragma acc parallel loop
-   for (int i = 0; i < nx ; i++) {
-      for (int j = 0; j < ny ; j++) {
+   #pragma acc parallel loop collapse(2) copyin(image[0:nx*ny]) copyout(image_invert[0:nx*ny])
+   for (int j = 0; j < ny ; j++) {
+      for (int i = 0; i < nx ; i++) {
          int p = pixel(i,j,nx);
          image_invert[p] = 255 - image[p];
          image_invert[p] = limit_pixel(image_invert[p]);
@@ -77,9 +77,9 @@ void invert(int* image, int* image_invert, int nx, int ny){
 /*smooth*/
 void smooth(int* image, int* image_smooth, int nx, int ny){
    
-   #pragma acc parallel loop
-   for (int i = 1; i < nx-1 ; i++) {
-      for (int j = 1; j < ny-1 ; j++) {
+   #pragma acc parallel loop collapse(2) copyin(image[0:nx*ny]) copyout(image_smooth[0:nx*ny])
+   for (int j = 1; j < ny-1 ; j++) {
+      for (int i = 1; i < nx-1 ; i++) {
          image_smooth[pixel(i,j,nx)] = (
             image[pixel(i-1,j+1,nx)] + 
             image[pixel(i,j+1,nx)] +
@@ -95,14 +95,15 @@ void smooth(int* image, int* image_smooth, int nx, int ny){
       }
    }
    clear_border(image_smooth, nx, ny);
+   
 }
 
 /*detect*/
 void detect(int* image, int* image_detect, int nx, int ny){
   
-   #pragma acc parallel loop
-   for(int i = 1; i < nx-1 ; i++) {
-      for(int j = 1; j < ny-1 ; j++) {
+   #pragma acc parallel loop collapse(2) copyin(image[0:nx*ny]) copyout(image_detect[0:nx*ny])
+   for(int j = 1; j < ny-1 ; j++) {
+      for(int i = 1; i < nx-1 ; i++) {
          image_detect[pixel(i,j,nx)] =
             image[pixel(i-1,j,nx)] +
             image[pixel(i+1,j,nx)] +
@@ -119,9 +120,9 @@ void detect(int* image, int* image_detect, int nx, int ny){
 /*enhance*/
 void enhance(int* image,int *image_enhance,int nx, int ny){
   
-   #pragma acc parallel loop
-   for (int i = 1; i < nx-1 ; i++) {
-      for (int j = 1; j < ny-1 ; j++) {
+   #pragma acc parallel loop collapse(2) copyin(image[0:nx*ny]) copyout(image_enhance[0:nx*ny])
+   for (int j = 1; j < ny-1 ; j++) {
+      for (int i = 1; i < nx-1 ; i++) {
          image_enhance[pixel(i,j,nx)] = 5 * image[pixel(i,j,nx)] - (
             image[pixel(i-1,j,nx)] +
             image[pixel(i+1,j,nx)] +
@@ -164,14 +165,16 @@ int main (int argc, char *argv[])
    readimg(filename,nx,ny,image);
 
    /* Apply filters */
-   double t1 = 0.0;
-   // #pragma acc data copyin(image[0:nx*ny]) copyout(image_invert[0:nx*ny], image_invert[0:nx*ny], image_smooth[0:nx*ny], image_detect[0:nx*ny], image_enhance[0:nx*ny]) {
+   double t1 = omp_get_wtime();
+   #pragma acc data copyin(image[0:nx*ny]) copyout(image_invert[0:nx*ny], image_invert[0:nx*ny], image_smooth[0:nx*ny], image_detect[0:nx*ny], image_enhance[0:nx*ny])
+   {      
       invert(image, image_invert, nx, ny);
       smooth(image, image_smooth, nx, ny);
       detect(image, image_detect, nx, ny);
       enhance(image, image_enhance, nx, ny);
-   // }
-   double t2 = 0.0;
+   }
+
+   double t2 = omp_get_wtime();
    double runtime = t2 - t1;
 
 

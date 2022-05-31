@@ -1,8 +1,8 @@
 #!/bin/bash
 
 #SBATCH --job-name=image_streams
-#SBATCH --output=image_%j.out
-#SBATCH --error=image_%j.err
+#SBATCH --output=image.out
+#SBATCH --error=image.err
 #SBATCH --cpus-per-task=1
 #SBATCH --ntasks=1
 #SBATCH --gres=gpu:1             	# Number of gpus
