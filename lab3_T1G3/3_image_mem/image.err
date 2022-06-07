@@ -3,4 +3,4 @@ invert:
          Generating present(image_inverse_host[elems*k:elems],image_host[elems*k:elems])
          Generating Tesla code
          68, #pragma acc loop gang, vector(128) /* blockIdx.x threadIdx.x */
-     75, Generating update self(image_inverse_host[elems*k:elems],image_host[elems*k:elems])
+     72, Generating update self(image_inverse_host[elems*k:elems],image_host[elems*k:elems])
