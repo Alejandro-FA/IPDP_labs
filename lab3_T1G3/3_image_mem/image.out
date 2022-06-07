@@ -1,0 +1,1 @@
+pgcc -fast -Minfo=accel   -ta=tesla -o imgproc_mem imgproc_mem.c
