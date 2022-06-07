@@ -56,13 +56,15 @@ void invert(int* image_host, int* image_inverse_host, int* image_device, int* im
       acc_map_data(&image_host[k * elems], image_device, elems*sizeof(int));
       acc_map_data(&image_inverse_host[k * elems], image_inverse_device, elems*sizeof(int));
       
-      #pragma acc parallel loop
+      // TODO: do updates
+      #pragma acc parallel loop present
       for (int j = 0; j < elems ; j++) {
          /*image_inverse_device[p] = 255 - image_device[p];
          image_inverse_device[p] = limit_pixel(image_device[p]);*/
-         image_inverse_device[j] = 1;
+         image_inverse_device[j] = 1; // FIXME: use host variable instead
          image_device[j] = 1;
       }
+      // TODO: do updates
 
       acc_unmap_data( &image_host[k * elems] );
       acc_unmap_data(&image_inverse_host[k * elems] );
