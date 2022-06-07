@@ -1,6 +1,6 @@
 invert:
-     64, Generating update device(image_inverse_host[elems*k:elems],image_host[elems*k:elems])
+     57, Generating update device(image_host[elems*k:elems])
          Generating present(image_inverse_host[elems*k:elems],image_host[elems*k:elems])
          Generating Tesla code
-         68, #pragma acc loop gang, vector(128) /* blockIdx.x threadIdx.x */
-     72, Generating update self(image_inverse_host[elems*k:elems],image_host[elems*k:elems])
+         61, #pragma acc loop gang, vector(128) /* blockIdx.x threadIdx.x */
+     65, Generating update self(image_inverse_host[elems*k:elems])

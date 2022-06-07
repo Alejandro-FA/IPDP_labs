@@ -56,11 +56,11 @@ void invert(int* image_host, int* image_inverse_host, int nx, int ny) {
       acc_map_data(&image_host[k * elems], image_device, elems*sizeof(int));
       acc_map_data(&image_inverse_host[k * elems], image_inverse_device, elems*sizeof(int));
       
-      #pragma acc update device (image_host[k*elems: elems], image_inverse_host[k*elems: elems])
+      #pragma acc update device (image_host[k*elems: elems])
       #pragma acc parallel loop present(image_host[k*elems: elems], image_inverse_host[k*elems: elems])
       for (int j = k*elems; j < (k+1)*elems ; j++)
          image_inverse_host[j] = 255 - image_host[j];
-      #pragma acc update host (image_host[k*elems: elems], image_inverse_host[k*elems: elems])
+      #pragma acc update host (image_inverse_host[k*elems: elems])
 
       acc_unmap_data( &image_host[k * elems] );
       acc_unmap_data(&image_inverse_host[k * elems] );
