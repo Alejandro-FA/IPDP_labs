@@ -42,13 +42,6 @@ void saveimg(char *filename,int nx,int ny,int *image){
 }
 
 //////////* OUR OWN FUNCTIONS *////////////
-
-int limit_pixel(int value) {
-   if (value > 255) return 255;
-   else if(value < 0) return 0;
-   else return value;
-}
-
 /*invert*/
 void invert(int* image_host, int* image_inverse_host, int nx, int ny) {
    // GPU allocation
