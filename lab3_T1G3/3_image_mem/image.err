@@ -1,6 +1,6 @@
 invert:
-     57, Generating update device(image_inverse_host[k*elems:elems],image_host[k*elems:elems])
+     64, Generating update device(image_inverse_host[elems*k:elems],image_host[elems*k:elems])
+         Generating present(image_inverse_host[elems*k:elems],image_host[elems*k:elems])
          Generating Tesla code
-         63, #pragma acc loop gang, vector(128) /* blockIdx.x threadIdx.x */
-     57, Generating implicit copyout(image_inverse_device[:elems],image_device[:elems]) [if not already present]
-/shared/var/spool/slurmd/job30336/slurm_script: line 14:  1211 Segmentation fault      ./imgproc_mem lleo 1920 1214
+         68, #pragma acc loop gang, vector(128) /* blockIdx.x threadIdx.x */
+     75, Generating update self(image_inverse_host[elems*k:elems],image_host[elems*k:elems])

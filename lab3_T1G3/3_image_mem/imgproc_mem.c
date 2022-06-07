@@ -50,25 +50,34 @@ int limit_pixel(int value) {
 }
 
 /*invert*/
-void invert(int* image_host, int* image_inverse_host, int* image_device, int* image_inverse_device, int nx, int ny, int elems){
-   
-   for (int k = 0; k < 4; k++) {
+void invert(int* image_host, int* image_inverse_host, int nx, int ny) {
+   // GPU allocation
+   int partitions = 4;
+   int elems = (nx*ny) / partitions;
+   int size = sizeof(int) * elems; 
+   int*   image_device = (int *) acc_malloc(size); 
+   int*   image_inverse_device  = (int *) acc_malloc(size);  
+
+   // Filtering process divided in 4 sections
+   for (int k = 0; k < partitions; k++) {
       acc_map_data(&image_host[k * elems], image_device, elems*sizeof(int));
       acc_map_data(&image_inverse_host[k * elems], image_inverse_device, elems*sizeof(int));
       
-      // TODO: do updates
-      #pragma acc parallel loop present
-      for (int j = 0; j < elems ; j++) {
-         /*image_inverse_device[p] = 255 - image_device[p];
-         image_inverse_device[p] = limit_pixel(image_device[p]);*/
-         image_inverse_device[j] = 1; // FIXME: use host variable instead
-         image_device[j] = 1;
+      #pragma acc update device (image_host[k*elems: elems], image_inverse_host[k*elems: elems])
+      #pragma acc parallel loop present(image_host[k*elems: elems], image_inverse_host[k*elems: elems])
+      for (int j = k*elems; j < (k+1)*elems ; j++) {
+         image_inverse_host[j] = 255 - image_host[j];
+         // image_inverse_host[j] = limit_pixel(image_host[j]); // FIXME: limit_pixel does not work as expected
       }
-      // TODO: do updates
+      #pragma acc update host (image_host[k*elems: elems], image_inverse_host[k*elems: elems])
 
       acc_unmap_data( &image_host[k * elems] );
       acc_unmap_data(&image_inverse_host[k * elems] );
    }
+
+   // GPU deallocation
+   acc_free(image_device);
+   acc_free(image_inverse_device);
 }
 
 
@@ -90,42 +99,28 @@ int main (int argc, char *argv[])
 
    printf("%s %d %d\n", filename, nx, ny);
 
-   /* Allocate pointers */
    // CPU allocation
-   int*   image_host = (int *) malloc(sizeof(int)*nx*ny); 
-   int*   image_inverse_host  = (int *) malloc(sizeof(int)*nx*ny);  
-
-   // GPU allocation
-   int elems = (nx*ny) / 4; // quarter of the image
-   int size = sizeof(int) * elems; 
-   int*   image_device = (int *) acc_malloc(size); 
-   int*   image_inverse_device  = (int *) acc_malloc(size);  
+   int*   image = (int *) malloc(sizeof(int)*nx*ny); 
+   int*   image_inverse  = (int *) malloc(sizeof(int)*nx*ny);  
    
-
    /* Read image and save in array imgage */
-   readimg(filename,nx,ny,image_host);
+   readimg(filename,nx,ny,image);
 
    /* Apply filters */
    double t1 = omp_get_wtime();
-   invert(image_host, image_inverse_host, image_device, image_inverse_device, nx, ny, elems);
+   invert(image, image_inverse, nx, ny);
    
    double t2 = omp_get_wtime();
    double runtime = t2 - t1;
-
 
    printf("Total time: %f\n",runtime);
 
    /* Save images */
    char fileout[255]={0};
    sprintf(fileout, "%s-inverse.txt", argv[1]);
-   saveimg(fileout,nx,ny,image_inverse_host);
-  
-   /* Deallocate  */
-   // GPU deallocation
-   acc_free(image_device);
-   acc_free(image_inverse_device);
+   saveimg(fileout,nx,ny,image_inverse);
 
    // CPU deallocation
-   free(image_host);
-   free(image_inverse_host);
+   free(image);
+   free(image_inverse);
 }
