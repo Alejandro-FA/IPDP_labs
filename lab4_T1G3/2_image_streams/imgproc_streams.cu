@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include "cuda.h"
 
 #define pixel(i, j, n)  (((j)*(n)) +(i))
 
@@ -40,25 +41,79 @@ void saveimg(char *filename,int nx,int ny,int *image){
 
 }
 
-/*invert*/
-__global__ void invert(int* image, int* image_invert, int nx, int ny){
+// invert
+__global__ void invert(int* image, int* image_invert, int nx, int ny) {
+   int i = threadIdx.x + blockIdx.x * blockDim.x;
+   int j = threadIdx.y + blockIdx.y * blockDim.y;
 
+   if (i < nx && j < ny) {
+      int p = pixel(i,j,nx);
+      image_invert[p] = 255 - image[p];
+   }
 }
 
-/*smooth*/
+
+// smooth
 __global__ void smooth(int* image, int* image_smooth, int nx, int ny){
+   int i = threadIdx.x + blockIdx.x * blockDim.x;
+   int j = threadIdx.y + blockIdx.y * blockDim.y;
 
+   if (i < nx && j < ny) {
+      if (i == 0 || i == nx-1 || j == 0 || j == ny-1) image_smooth[pixel(i,j,nx)] = 0;
+      else {
+         image_smooth[pixel(i,j,nx)] = (
+            image[pixel(i-1,j+1,nx)] + 
+            image[pixel(i,j+1,nx)] +
+            image[pixel(i+1,j+1,nx)] +
+            image[pixel(i-1,j,nx)] +
+            image[pixel(i,j,nx)] +
+            image[pixel(i+1,j,nx)]+
+            image[pixel(i-1,j-1,nx)] +
+            image[pixel(i,j-1,nx)] +
+            image[pixel(i+1,j-1,nx)] ) / 9;
+            
+         image_smooth[pixel(i,j,nx)] = image_smooth[pixel(i,j,nx)] < 0 ? 0 : image_smooth[pixel(i,j,nx)] > 255 ? 255 : image_smooth[pixel(i,j,nx)];
+      }
+   }
 }
 
-/*detect*/
+// detect
 __global__ void detect(int* image, int* image_detect, int nx, int ny){
+   int i = threadIdx.x + blockIdx.x * blockDim.x;
+   int j = threadIdx.y + blockIdx.y * blockDim.y;
    
+   if (i < nx && j < ny) {
+      if (i == 0 || i == nx-1 || j == 0 || j == ny-1) image_detect[pixel(i,j,nx)] = 0;
+      else {
+         image_detect[pixel(i,j,nx)] =
+            image[pixel(i-1,j,nx)] +
+            image[pixel(i+1,j,nx)] +
+            image[pixel(i,j-1,nx)] +
+            image[pixel(i,j+1,nx)] -
+            4 * image[pixel(i,j,nx)];
+
+         image_detect[pixel(i,j,nx)] = image_detect[pixel(i,j,nx)] < 0 ? 0 : image_detect[pixel(i,j,nx)] > 255 ? 255 : image_detect[pixel(i,j,nx)];
+      }
+   }
 }
 
-/*enhance*/
+// enhance
 __global__ void enhance(int* image,int *image_enhance,int nx, int ny){
+   int i = threadIdx.x + blockIdx.x * blockDim.x;
+   int j = threadIdx.y + blockIdx.y * blockDim.y;
    
+   if (i < nx && j < ny) {
+      if (i == 0 || i == nx-1 || j == 0 || j == ny-1) image_enhance[pixel(i,j,nx)] = 0;
+      else {
+         image_enhance[pixel(i,j,nx)] = 5 * image[pixel(i,j,nx)] - (
+            image[pixel(i-1,j,nx)] +
+            image[pixel(i+1,j,nx)] +
+            image[pixel(i,j-1,nx)] +
+            image[pixel(i,j+1,nx)] );
 
+         image_enhance[pixel(i,j,nx)] = image_enhance[pixel(i,j,nx)] < 0 ? 0 : image_enhance[pixel(i,j,nx)] > 255 ? 255 : image_enhance[pixel(i,j,nx)];  
+      }
+   }
 }
 
 /* Main program */
@@ -79,22 +134,64 @@ int main (int argc, char *argv[])
 
    printf("%s %d %d\n", filename, nx, ny);
 
-   /* Allocate CPU and GPU pointers */
+   /* Allocate CPU pointers */
 
    int*   image=(int *) malloc(sizeof(int)*nx*ny); 
    int*   image_invert  = (int *) malloc(sizeof(int)*nx*ny);  
    int*   image_smooth  = (int *) malloc(sizeof(int)*nx*ny);  
    int*   image_detect  = (int *) malloc(sizeof(int)*nx*ny);  
    int*   image_enhance = (int *) malloc(sizeof(int)*nx*ny); 
-  
 
+   int*   d_image; 
+   int*   d_image_invert;
+   int*   d_image_smooth;
+   int*   d_image_detect;
+   int*   d_image_enhance;
+   
    /* Read image and save in array imgage */
    readimg(filename,nx,ny,image);
 
+   /* Decide Block and Grid dimensions */
+   int B = 16; // Number of blocks (maximum number of blocks that can be simultaneously active)
+   dim3 dimBlock(B, B, 1);
+   int dimgx = (nx+B-1)/B;
+   int dimgy = (ny+B-1)/B;
+   dim3 dimGrid(dimgx, dimgy, 1);
 
-  /* Print runtime */
+   float runtime;
+   cudaEvent_t start, stop;
+   cudaEventCreate(&start);
+   cudaEventCreate(&stop);
 
+   cudaEventRecord(start);
+
+   /* Allocate GPU pointers */
+   cudaMalloc((void**)&d_image, sizeof(int)*nx*ny);
+   cudaMalloc((void**)&d_image_invert, sizeof(int)*nx*ny);
+   cudaMalloc((void**)&d_image_smooth, sizeof(int)*nx*ny);
+   cudaMalloc((void**)&d_image_detect, sizeof(int)*nx*ny);
+   cudaMalloc((void**)&d_image_enhance, sizeof(int)*nx*ny);
+
+   /* Copy image to GPU */
+   cudaMemcpy(d_image, image, sizeof(int)*nx*ny, cudaMemcpyHostToDevice);  
+
+   /* Filters */
+   invert<<<dimGrid, dimBlock>>>(d_image, d_image_invert, nx, ny);
+   smooth<<<dimGrid, dimBlock>>>(d_image, d_image_smooth, nx, ny);
+   detect<<<dimGrid, dimBlock>>>(d_image, d_image_detect, nx, ny);
+   enhance<<<dimGrid, dimBlock>>>(d_image, d_image_enhance, nx, ny);
    
+   /* Image transfer */
+   cudaMemcpy(image_invert, d_image_invert, sizeof(int)*nx*ny, cudaMemcpyDeviceToHost); 
+   cudaMemcpy(image_smooth, d_image_smooth, sizeof(int)*nx*ny, cudaMemcpyDeviceToHost);
+   cudaMemcpy(image_detect, d_image_detect, sizeof(int)*nx*ny, cudaMemcpyDeviceToHost);
+   cudaMemcpy(image_enhance, d_image_enhance, sizeof(int)*nx*ny, cudaMemcpyDeviceToHost);
+   
+   cudaEventRecord(stop);
+   cudaEventSynchronize(stop);
+   cudaEventElapsedTime(&runtime, start, stop);
+   printf("It took %f ms to apply all the filters and to manage all the data. \n", runtime);
+
    /* Save images */
    char fileout[255]={0};
    sprintf(fileout, "%s-inverse.txt", argv[1]);
@@ -106,7 +203,14 @@ int main (int argc, char *argv[])
    sprintf(fileout, "%s-enhance.txt", argv[1]);
    saveimg(fileout,nx,ny,image_enhance);
 
-   /* Deallocate CPU and GPU pointers*/
+   /* Deallocate GPU pointers */
+   cudaFree(d_image);
+   cudaFree(d_image_invert);
+   cudaFree(d_image_smooth);
+   cudaFree(d_image_detect);
+   cudaFree(d_image_enhance);
+
+   /* Deallocate CPU pointers*/
    free(image);
    free(image_invert);
    free(image_smooth);
