@@ -163,6 +163,7 @@ int main (int argc, char *argv[])
    cudaEventCreate(&start);
    cudaEventCreate(&stop);
 
+
    cudaEventRecord(start);
 
    /* Allocate GPU pointers */
@@ -175,18 +176,31 @@ int main (int argc, char *argv[])
    /* Copy image to GPU */
    cudaMemcpy(d_image, image, sizeof(int)*nx*ny, cudaMemcpyHostToDevice);  
 
+   /* Create Streams */
+   cudaStream_t stream1, stream2, stream3, stream4;
+   cudaStreamCreate(&stream1);
+   cudaStreamCreate(&stream2);
+   cudaStreamCreate(&stream3);
+   cudaStreamCreate(&stream4);
+
    /* Filters */
-   invert<<<dimGrid, dimBlock>>>(d_image, d_image_invert, nx, ny);
-   smooth<<<dimGrid, dimBlock>>>(d_image, d_image_smooth, nx, ny);
-   detect<<<dimGrid, dimBlock>>>(d_image, d_image_detect, nx, ny);
-   enhance<<<dimGrid, dimBlock>>>(d_image, d_image_enhance, nx, ny);
+   invert<<<dimGrid, dimBlock, 0, stream1>>>(d_image, d_image_invert, nx, ny);
+   smooth<<<dimGrid, dimBlock, 0, stream2>>>(d_image, d_image_smooth, nx, ny);
+   detect<<<dimGrid, dimBlock, 0, stream3>>>(d_image, d_image_detect, nx, ny);
+   enhance<<<dimGrid, dimBlock, 0, stream4>>>(d_image, d_image_enhance, nx, ny);
    
    /* Image transfer */
-   cudaMemcpy(image_invert, d_image_invert, sizeof(int)*nx*ny, cudaMemcpyDeviceToHost); 
-   cudaMemcpy(image_smooth, d_image_smooth, sizeof(int)*nx*ny, cudaMemcpyDeviceToHost);
-   cudaMemcpy(image_detect, d_image_detect, sizeof(int)*nx*ny, cudaMemcpyDeviceToHost);
-   cudaMemcpy(image_enhance, d_image_enhance, sizeof(int)*nx*ny, cudaMemcpyDeviceToHost);
+   cudaMemcpyAsync(image_invert, d_image_invert, sizeof(int)*nx*ny, cudaMemcpyDeviceToHost, stream1); 
+   cudaMemcpyAsync(image_smooth, d_image_smooth, sizeof(int)*nx*ny, cudaMemcpyDeviceToHost, stream2);
+   cudaMemcpyAsync(image_detect, d_image_detect, sizeof(int)*nx*ny, cudaMemcpyDeviceToHost, stream3);
+   cudaMemcpyAsync(image_enhance, d_image_enhance, sizeof(int)*nx*ny, cudaMemcpyDeviceToHost, stream4);
    
+   /* Delete streams */
+   cudaStreamDestroy(stream1);
+   cudaStreamDestroy(stream2);
+   cudaStreamDestroy(stream3);
+   cudaStreamDestroy(stream4);
+
    cudaEventRecord(stop);
    cudaEventSynchronize(stop);
    cudaEventElapsedTime(&runtime, start, stop);
