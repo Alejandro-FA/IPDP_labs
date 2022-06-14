@@ -135,18 +135,17 @@ int main (int argc, char *argv[])
    printf("%s %d %d\n", filename, nx, ny);
 
    /* Allocate CPU pointers */
+   int   *image, *d_image; 
+   int   *image_invert, *d_image_invert;
+   int   *image_smooth, *d_image_smooth;
+   int   *image_detect, *d_image_detect;
+   int   *image_enhance, *d_image_enhance;
 
-   int*   image=(int *) malloc(sizeof(int)*nx*ny); 
-   int*   image_invert  = (int *) malloc(sizeof(int)*nx*ny);  
-   int*   image_smooth  = (int *) malloc(sizeof(int)*nx*ny);  
-   int*   image_detect  = (int *) malloc(sizeof(int)*nx*ny);  
-   int*   image_enhance = (int *) malloc(sizeof(int)*nx*ny); 
-
-   int*   d_image; 
-   int*   d_image_invert;
-   int*   d_image_smooth;
-   int*   d_image_detect;
-   int*   d_image_enhance;
+   cudaMallocHost((void**)&image, sizeof(int)*nx*ny);
+   cudaMallocHost((void**)&image_invert, sizeof(int)*nx*ny);
+   cudaMallocHost((void**)&image_smooth, sizeof(int)*nx*ny);
+   cudaMallocHost((void**)&image_detect, sizeof(int)*nx*ny);
+   cudaMallocHost((void**)&image_enhance, sizeof(int)*nx*ny);
    
    /* Read image and save in array imgage */
    readimg(filename,nx,ny,image);
@@ -225,9 +224,9 @@ int main (int argc, char *argv[])
    cudaFree(d_image_enhance);
 
    /* Deallocate CPU pointers*/
-   free(image);
-   free(image_invert);
-   free(image_smooth);
-   free(image_detect);
-   free(image_enhance);
+   cudaFree(image);
+   cudaFree(image_invert);
+   cudaFree(image_smooth);
+   cudaFree(image_detect);
+   cudaFree(image_enhance);
 }

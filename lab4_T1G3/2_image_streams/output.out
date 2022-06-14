@@ -1,3 +1,3 @@
 nvcc -O3	 -o imgproc_streams imgproc_streams.cu
 lleo.txt 1920 1214
-It took 29.773760 ms to apply all the filters and to manage all the data. 
+It took 6.066432 ms to apply all the filters and to manage all the data. 
