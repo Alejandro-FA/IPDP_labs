@@ -166,11 +166,11 @@ int main (int argc, char *argv[])
    cudaEventRecord(start);
 
    /* Allocate GPU pointers */
-   cudaMalloc((void**)&d_image, sizeof(int)*nx*ny);
-   cudaMalloc((void**)&d_image_invert, sizeof(int)*nx*ny);
-   cudaMalloc((void**)&d_image_smooth, sizeof(int)*nx*ny);
-   cudaMalloc((void**)&d_image_detect, sizeof(int)*nx*ny);
-   cudaMalloc((void**)&d_image_enhance, sizeof(int)*nx*ny);
+   cudaMallocHost((void**)&d_image, sizeof(int)*nx*ny);
+   cudaMallocHost((void**)&d_image_invert, sizeof(int)*nx*ny);
+   cudaMallocHost((void**)&d_image_smooth, sizeof(int)*nx*ny);
+   cudaMallocHost((void**)&d_image_detect, sizeof(int)*nx*ny);
+   cudaMallocHost((void**)&d_image_enhance, sizeof(int)*nx*ny);
 
    /* Copy image to GPU */
    cudaMemcpy(d_image, image, sizeof(int)*nx*ny, cudaMemcpyHostToDevice);  
