@@ -175,11 +175,11 @@ int main (int argc, char *argv[])
    cudaStreamCreate(&stream4);
 
    /* Allocate GPU pointers */
-   cudaMalloc((void**)&d_image, sizeof(int)*nx*ny);
-   cudaMalloc((void**)&d_image_invert, sizeof(int)*nx*ny);
-   cudaMalloc((void**)&d_image_smooth, sizeof(int)*nx*ny);
-   cudaMalloc((void**)&d_image_detect, sizeof(int)*nx*ny);
-   cudaMalloc((void**)&d_image_enhance, sizeof(int)*nx*ny);
+   cudaMallocHost((void**)&d_image, sizeof(int)*nx*ny);
+   cudaMallocHost((void**)&d_image_invert, sizeof(int)*nx*ny);
+   cudaMallocHost((void**)&d_image_smooth, sizeof(int)*nx*ny);
+   cudaMallocHost((void**)&d_image_detect, sizeof(int)*nx*ny);
+   cudaMallocHost((void**)&d_image_enhance, sizeof(int)*nx*ny);
 
    /* Copy image to GPU */
    cudaMemcpy(d_image, h_image, sizeof(int)*nx*ny, cudaMemcpyHostToDevice);  // Sync version since we need it in all streams
