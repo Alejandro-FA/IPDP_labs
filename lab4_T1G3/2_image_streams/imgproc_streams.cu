@@ -38,7 +38,6 @@ void saveimg(char *filename,int nx,int ny,int *image){
       fprintf(fp,"\n");
    }
    fclose(fp);
-
 }
 
 // invert
@@ -71,7 +70,8 @@ __global__ void smooth(int* image, int* image_smooth, int nx, int ny){
             image[pixel(i-1,j-1,nx)] +
             image[pixel(i,j-1,nx)] +
             image[pixel(i+1,j-1,nx)] ) / 9;
-            
+
+         // Ensure that the pixel value is between 0 and 255 
          image_smooth[pixel(i,j,nx)] = image_smooth[pixel(i,j,nx)] < 0 ? 0 : image_smooth[pixel(i,j,nx)] > 255 ? 255 : image_smooth[pixel(i,j,nx)];
       }
    }
@@ -92,6 +92,7 @@ __global__ void detect(int* image, int* image_detect, int nx, int ny){
             image[pixel(i,j+1,nx)] -
             4 * image[pixel(i,j,nx)];
 
+         // Ensure that the pixel value is between 0 and 255 
          image_detect[pixel(i,j,nx)] = image_detect[pixel(i,j,nx)] < 0 ? 0 : image_detect[pixel(i,j,nx)] > 255 ? 255 : image_detect[pixel(i,j,nx)];
       }
    }
@@ -111,6 +112,7 @@ __global__ void enhance(int* image,int *image_enhance,int nx, int ny){
             image[pixel(i,j-1,nx)] +
             image[pixel(i,j+1,nx)] );
 
+         // Ensure that the pixel value is between 0 and 255 
          image_enhance[pixel(i,j,nx)] = image_enhance[pixel(i,j,nx)] < 0 ? 0 : image_enhance[pixel(i,j,nx)] > 255 ? 255 : image_enhance[pixel(i,j,nx)];  
       }
    }
@@ -135,20 +137,20 @@ int main (int argc, char *argv[])
    printf("%s %d %d\n", filename, nx, ny);
 
    /* Allocate CPU pointers */
-   int   *image, *d_image; 
-   int   *image_invert, *d_image_invert;
-   int   *image_smooth, *d_image_smooth;
-   int   *image_detect, *d_image_detect;
-   int   *image_enhance, *d_image_enhance;
+   int   *h_image, *d_image; 
+   int   *h_image_invert, *d_image_invert;
+   int   *h_image_smooth, *d_image_smooth;
+   int   *h_image_detect, *d_image_detect;
+   int   *h_image_enhance, *d_image_enhance;
 
-   cudaMallocHost((void**)&image, sizeof(int)*nx*ny);
-   cudaMallocHost((void**)&image_invert, sizeof(int)*nx*ny);
-   cudaMallocHost((void**)&image_smooth, sizeof(int)*nx*ny);
-   cudaMallocHost((void**)&image_detect, sizeof(int)*nx*ny);
-   cudaMallocHost((void**)&image_enhance, sizeof(int)*nx*ny);
+   cudaMallocHost((void**)&h_image, sizeof(int)*nx*ny);
+   cudaMallocHost((void**)&h_image_invert, sizeof(int)*nx*ny);
+   cudaMallocHost((void**)&h_image_smooth, sizeof(int)*nx*ny);
+   cudaMallocHost((void**)&h_image_detect, sizeof(int)*nx*ny);
+   cudaMallocHost((void**)&h_image_enhance, sizeof(int)*nx*ny);
    
    /* Read image and save in array imgage */
-   readimg(filename,nx,ny,image);
+   readimg(filename,nx,ny,h_image);
 
    /* Decide Block and Grid dimensions */
    int B = 16; // Number of blocks (maximum number of blocks that can be simultaneously active)
@@ -162,8 +164,15 @@ int main (int argc, char *argv[])
    cudaEventCreate(&start);
    cudaEventCreate(&stop);
 
-
+   /************************************ Start recording ************************************/
    cudaEventRecord(start);
+
+   /* Create Streams */
+   cudaStream_t stream1, stream2, stream3, stream4;
+   cudaStreamCreate(&stream1);
+   cudaStreamCreate(&stream2);
+   cudaStreamCreate(&stream3);
+   cudaStreamCreate(&stream4);
 
    /* Allocate GPU pointers */
    cudaMalloc((void**)&d_image, sizeof(int)*nx*ny);
@@ -173,14 +182,7 @@ int main (int argc, char *argv[])
    cudaMalloc((void**)&d_image_enhance, sizeof(int)*nx*ny);
 
    /* Copy image to GPU */
-   cudaMemcpy(d_image, image, sizeof(int)*nx*ny, cudaMemcpyHostToDevice);  
-
-   /* Create Streams */
-   cudaStream_t stream1, stream2, stream3, stream4;
-   cudaStreamCreate(&stream1);
-   cudaStreamCreate(&stream2);
-   cudaStreamCreate(&stream3);
-   cudaStreamCreate(&stream4);
+   cudaMemcpy(d_image, h_image, sizeof(int)*nx*ny, cudaMemcpyHostToDevice);  // Sync version since we need it in all streams
 
    /* Filters */
    invert<<<dimGrid, dimBlock, 0, stream1>>>(d_image, d_image_invert, nx, ny);
@@ -189,10 +191,10 @@ int main (int argc, char *argv[])
    enhance<<<dimGrid, dimBlock, 0, stream4>>>(d_image, d_image_enhance, nx, ny);
    
    /* Image transfer */
-   cudaMemcpyAsync(image_invert, d_image_invert, sizeof(int)*nx*ny, cudaMemcpyDeviceToHost, stream1); 
-   cudaMemcpyAsync(image_smooth, d_image_smooth, sizeof(int)*nx*ny, cudaMemcpyDeviceToHost, stream2);
-   cudaMemcpyAsync(image_detect, d_image_detect, sizeof(int)*nx*ny, cudaMemcpyDeviceToHost, stream3);
-   cudaMemcpyAsync(image_enhance, d_image_enhance, sizeof(int)*nx*ny, cudaMemcpyDeviceToHost, stream4);
+   cudaMemcpyAsync(h_image_invert, d_image_invert, sizeof(int)*nx*ny, cudaMemcpyDeviceToHost, stream1); 
+   cudaMemcpyAsync(h_image_smooth, d_image_smooth, sizeof(int)*nx*ny, cudaMemcpyDeviceToHost, stream2);
+   cudaMemcpyAsync(h_image_detect, d_image_detect, sizeof(int)*nx*ny, cudaMemcpyDeviceToHost, stream3);
+   cudaMemcpyAsync(h_image_enhance, d_image_enhance, sizeof(int)*nx*ny, cudaMemcpyDeviceToHost, stream4);
    
    /* Delete streams */
    cudaStreamDestroy(stream1);
@@ -203,18 +205,20 @@ int main (int argc, char *argv[])
    cudaEventRecord(stop);
    cudaEventSynchronize(stop);
    cudaEventElapsedTime(&runtime, start, stop);
+   /************************************* End recording *************************************/
+
    printf("It took %f ms to apply all the filters and to manage all the data. \n", runtime);
 
    /* Save images */
    char fileout[255]={0};
    sprintf(fileout, "%s-inverse.txt", argv[1]);
-   saveimg(fileout,nx,ny,image_invert);
+   saveimg(fileout,nx,ny,h_image_invert);
    sprintf(fileout, "%s-smooth.txt", argv[1]);
-   saveimg(fileout,nx,ny,image_smooth);
+   saveimg(fileout,nx,ny,h_image_smooth);
    sprintf(fileout, "%s-detect.txt", argv[1]);
-   saveimg(fileout,nx,ny,image_detect);
+   saveimg(fileout,nx,ny,h_image_detect);
    sprintf(fileout, "%s-enhance.txt", argv[1]);
-   saveimg(fileout,nx,ny,image_enhance);
+   saveimg(fileout,nx,ny,h_image_enhance);
 
    /* Deallocate GPU pointers */
    cudaFree(d_image);
@@ -224,9 +228,9 @@ int main (int argc, char *argv[])
    cudaFree(d_image_enhance);
 
    /* Deallocate CPU pointers*/
-   cudaFree(image);
-   cudaFree(image_invert);
-   cudaFree(image_smooth);
-   cudaFree(image_detect);
-   cudaFree(image_enhance);
+   cudaFreeHost(h_image);
+   cudaFreeHost(h_image_invert);
+   cudaFreeHost(h_image_smooth);
+   cudaFreeHost(h_image_detect);
+   cudaFreeHost(h_image_enhance);
 }
