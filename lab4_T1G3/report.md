@@ -12,5 +12,9 @@ The execution of the code from the GPU allocation to the last memory transfer ta
 
 ## Exercise 2
 
+First of all, in this case in order to allocate the pointers of the GPU we used `cudaMallocHost()` since we realized it optimized a lot the execution of the code. As before, we copy the original image to the GPU pointer and then we apply the filters in different streams (one for each filter). In this way we apply the filters in an asynchronous way.  
 
+After that we start the asyncrhonous memory transfers from the GPU to the CPU. Since we were applying the filters in different streams, each of the memory copies are done in its respective stream. Otherwise the image would be transfered without verifying whether the image has been completely filtered.
+
+In this case the execution is quite faster and it only takes **5.93 ms**. It has to be said that at first we did not use `cudaMallocHost()` and the code was poorly optimized. 
 
